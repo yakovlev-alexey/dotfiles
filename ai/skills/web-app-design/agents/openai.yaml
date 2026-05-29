@@ -1,0 +1,5 @@
+interface:
+  display_name: "Web App Design"
+  short_description: "TypeScript web app architecture guide"
+  default_prompt: "Use $web-app-design to choose focused TypeScript web app architecture guidance for vertical slices, React composition, frontend state, backend layers, shared contracts, and testing."
+

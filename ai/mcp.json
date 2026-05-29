@@ -1,0 +1,90 @@
+{
+  "tracker": {
+    "enabled": true,
+    "transport": "local",
+    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "args": [
+      "-F",
+      "$HOME/.mcp_store/oauth_token",
+      "--endpoint",
+      "mcp.yandex.net/ws?servers=tracker_mcp"
+    ],
+    "clients": {
+      "cursor": {
+        "name": "tracker_mcp"
+      },
+      "opencode": {
+        "name": "tracker"
+      },
+      "codex": {
+        "name": "tracker"
+      }
+    }
+  },
+  "intrasearch": {
+    "enabled": true,
+    "transport": "local",
+    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "args": [
+      "-F",
+      "$HOME/.mcp_store/oauth_token",
+      "--endpoint",
+      "mcp.yandex.net/ws?servers=intrasearch"
+    ],
+    "clients": {
+      "cursor": {
+        "name": "intrasearch"
+      },
+      "opencode": {
+        "name": "intrasearch"
+      },
+      "codex": {
+        "name": "intrasearch"
+      }
+    }
+  },
+  "arcanum": {
+    "enabled": true,
+    "transport": "local",
+    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "args": [
+      "-F",
+      "$HOME/.mcp_store/oauth_token",
+      "--endpoint",
+      "mcp.yandex.net/ws?servers=arcanum"
+    ],
+    "clients": {
+      "cursor": {
+        "name": "arcanum"
+      },
+      "opencode": {
+        "name": "arcanum"
+      },
+      "codex": {
+        "name": "arcanum"
+      }
+    }
+  },
+  "devtools": {
+    "enabled": true,
+    "transport": "local",
+    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "args": [
+      "-F",
+      "$HOME/.mcp_store/oauth_token",
+      "--endpoint",
+      "mcp.yandex.net/ws?servers=devtools"
+    ],
+    "clients": {
+      "cursor": {
+        "name": "devtools"
+      },
+      "opencode": {
+        "enabled": false
+      },
+      "codex": {
+        "enabled": false
+      }
+    }
+  }
+}

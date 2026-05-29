@@ -1,0 +1,10 @@
+{
+  "~/arcadia-all/ai/artifacts/skills/infra/arc": "*",
+  "~/arcadia-all/ai/artifacts/skills/community/arcanum": "*",
+  "~/arcadia-all/ai/artifacts/skills/community/intrasearch": "*",
+  "~/arcadia-all/ai/artifacts/skills/community/sandbox": "*",
+  "~/arcadia-all/ai/artifacts/skills/community/tanker": "*",
+  "~/arcadia-all/ai/artifacts/skills/community/tracker": "*",
+  "~/arcadia-all/ai/artifacts/skills/community/wiki": "*",
+  "obra/superpowers": "writing-skills"
+}

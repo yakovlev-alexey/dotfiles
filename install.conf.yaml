@@ -1,0 +1,32 @@
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- create:
+  - ~/.config
+  - ~/.agents
+  - ~/.agents/instructions
+  - ~/.agents/skills
+  - ~/.agents/plugins
+  - ~/.codex
+  - ~/.codex/skills
+  - ~/.cursor
+  - ~/.config/opencode
+
+- link:
+    ~/:
+      glob: true
+      path: home/*
+      prefix: '.'
+    ~/.agents/instructions/:
+      glob: true
+      path: ai/instructions/*.md
+
+- shell:
+  - [./scripts/personal check, Checking personal variables]
+  - [./scripts/personal configure-git, Writing ~/.gitconfig.local]
+  - [./scripts/build-agents-md, Generating AGENTS.md files]
+  - [./scripts/install-skills, Syncing AI skills]
+  - [./scripts/install-plugins, Syncing local Codex plugins]
+  - [./scripts/install-mcp, Syncing MCP and agent configs]

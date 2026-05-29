@@ -1,0 +1,139 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h}
+skills_root="$repo_root/ai/skills"
+registry_path="$skills_root/skills.json"
+canonical_dir="$HOME/.agents/skills"
+projection_dirs=("$HOME/.codex/skills" "$HOME/.cursor/skills")
+
+die() {
+  print -u2 "$1"
+  exit 1
+}
+
+normalize_source() {
+  local source=$1
+  if [[ "$source" == '~' || "$source" == '~/'* ]]; then
+    print -r -- "$HOME${source#\~}"
+  elif [[ "$source" == ./* || "$source" == ../* ]]; then
+    print -r -- "$repo_root/$source"
+  elif [[ "$source" == /* || "$source" == *://* ]]; then
+    print -r -- "$source"
+  else
+    print -r -- "https://github.com/$source"
+  fi
+}
+
+copy_dir() {
+  local src=$1 dst=$2
+  [[ -d "$src" ]] || die "install-skills: missing directory: $src"
+  rm -rf "$dst"
+  mkdir -p "${dst:h}"
+  cp -R "$src" "$dst"
+}
+
+project_skill() {
+  local src=$1 dir target current
+  for dir in "${projection_dirs[@]}"; do
+    mkdir -p "$dir"
+    target="$dir/${src:t}"
+    if [[ -L "$target" ]]; then
+      current=$(readlink "$target")
+      [[ "$current" == "$src" || "${current:A}" == "${src:A}" ]] && continue
+      [[ "$current" == "$canonical_dir/"* ]] && rm -f "$target"
+    elif [[ -e "$target" ]]; then
+      if [[ -d "$target" && -d "$src" ]] && diff -qr "$target" "$src" >/dev/null 2>&1; then
+        rm -rf "$target"
+      else
+        print "install-skills: keeping unmanaged entry: $target"
+        continue
+      fi
+    fi
+    ln -s "$src" "$target"
+  done
+}
+
+mkdir -p "$canonical_dir" "${projection_dirs[@]}"
+typeset -Ua managed
+managed=()
+
+for skill_dir in "$skills_root"/*(N/); do
+  [[ -f "$skill_dir/SKILL.md" ]] || continue
+  name=${skill_dir:t}
+  copy_dir "$skill_dir" "$canonical_dir/$name"
+  managed+=("$name")
+done
+
+if [[ -f "$registry_path" ]]; then
+  while IFS= read -r entry; do
+    source=$(normalize_source "$(jq -r '.key' <<<"$entry")")
+    if [[ "$source" == /* && ! -e "$source" ]]; then
+      die "install-skills: missing local skill source: $source"
+    fi
+    value_type=$(jq -r '.value | type' <<<"$entry")
+    names=()
+
+    if [[ "$value_type" == string ]]; then
+      value=$(jq -r '.value' <<<"$entry")
+      if [[ "$value" == "*" ]]; then
+        if [[ -d "$source" && -f "$source/SKILL.md" ]]; then
+          names=("${source:t}")
+          rm -rf "$canonical_dir/${source:t}"
+          ln -s "$source" "$canonical_dir/${source:t}"
+        else
+          tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-skills.XXXXXX")
+          trap 'rm -rf "$tmpdir"' EXIT
+          (cd "$tmpdir" && npx skills add "$source" -a codex -y)
+          for staged in "$tmpdir/.agents/skills"/*(N/); do
+            names+=("${staged:t}")
+            copy_dir "$staged" "$canonical_dir/${staged:t}"
+          done
+        fi
+      else
+        names=("$value")
+      fi
+    elif [[ "$value_type" == array ]]; then
+      names=("${(@f)$(jq -r '.value[]' <<<"$entry")}")
+    else
+      die "install-skills: invalid registry entry: $entry"
+    fi
+
+    if [[ "$value_type" == array || ( "$value_type" == string && "$(jq -r '.value' <<<"$entry")" != "*" ) ]]; then
+      if [[ -d "$source" ]]; then
+        for name in "${names[@]}"; do
+          [[ -d "$source/$name" ]] || die "install-skills: missing selected local skill: $source/$name"
+          rm -rf "$canonical_dir/$name"
+          ln -s "$source/$name" "$canonical_dir/$name"
+        done
+      else
+        tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-skills.XXXXXX")
+        trap 'rm -rf "$tmpdir"' EXIT
+        command=(npx skills add "$source" -a codex -y)
+        for name in "${names[@]}"; do command+=(--skill "$name"); done
+        (cd "$tmpdir" && "${command[@]}")
+        for name in "${names[@]}"; do
+          [[ -d "$tmpdir/.agents/skills/$name" ]] || die "install-skills: staged skill not found: $name"
+          copy_dir "$tmpdir/.agents/skills/$name" "$canonical_dir/$name"
+        done
+      fi
+    fi
+
+    managed+=("${names[@]}")
+  done < <(jq -c 'to_entries[]' "$registry_path")
+fi
+
+typeset -A keep
+for name in "${managed[@]}"; do keep[$name]=1; done
+for entry in "$canonical_dir"/*(N); do
+  [[ -n "${keep[${entry:t}]-}" ]] || rm -rf "$entry"
+done
+
+for skill in "$canonical_dir"/*(N); do
+  [[ -d "$skill" || -L "$skill" ]] || continue
+  project_skill "$skill"
+done
+
+print "install-skills: synced ${#managed[@]} skills"

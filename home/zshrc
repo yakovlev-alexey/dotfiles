@@ -1,0 +1,21 @@
+export DOTFILES_HOME="${DOTFILES_HOME:-$HOME/Repos/dotfiles}"
+
+if [[ -x "$DOTFILES_HOME/scripts/personal" ]]; then
+  eval "$("$DOTFILES_HOME/scripts/personal" export 2>/dev/null || true)"
+fi
+
+[[ -r "$DOTFILES_HOME/shell/common.zsh" ]] && source "$DOTFILES_HOME/shell/common.zsh"
+
+case "$(uname -s)" in
+  Darwin)
+    [[ -r "$DOTFILES_HOME/shell/macos.zsh" ]] && source "$DOTFILES_HOME/shell/macos.zsh"
+    ;;
+  Linux)
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+      [[ -r "$DOTFILES_HOME/shell/wsl.zsh" ]] && source "$DOTFILES_HOME/shell/wsl.zsh"
+    fi
+    ;;
+esac
+
+[[ -r "$DOTFILES_HOME/shell/aliases.zsh" ]] && source "$DOTFILES_HOME/shell/aliases.zsh"
+[[ -r "$DOTFILES_HOME/shell/functions.zsh" ]] && source "$DOTFILES_HOME/shell/functions.zsh"

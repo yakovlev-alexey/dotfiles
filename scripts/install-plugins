@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h}
+plugins_path="$repo_root/ai/plugins/plugins.json"
+marketplace_path="$HOME/.agents/plugins/marketplace.json"
+plugins_dir="$HOME/.codex/plugins/dotfiles-local"
+
+mkdir -p "$plugins_dir" "${marketplace_path:h}"
+[[ -f "$plugins_path" ]] || echo '{}' > "$plugins_path"
+
+jq -n --arg name dotfiles-local '{name: $name, interface: {displayName: "Dotfiles Local"}, plugins: []}' > "$marketplace_path"
+print "install-plugins: synced 0 plugins"

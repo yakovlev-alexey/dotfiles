@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+profile=""
+mode="default"
+
+usage() {
+  cat <<'USAGE'
+Usage: ./install [--profile macos|wsl] [--sync-only|--check]
+USAGE
+}
+
+detect_profile() {
+  case "$(uname -s)" in
+    Darwin) echo macos ;;
+    Linux)
+      if grep -qi microsoft /proc/version 2>/dev/null; then
+        echo wsl
+      else
+        echo linux
+      fi
+      ;;
+    *) echo unknown ;;
+  esac
+}
+
+while (($# > 0)); do
+  case "$1" in
+    --profile)
+      profile="${2:-}"
+      shift 2
+      ;;
+    --sync-only|--check)
+      mode="$1"
+      shift
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "install: unknown argument: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+profile="${profile:-$(detect_profile)}"
+case "$profile" in
+  macos|wsl|linux) ;;
+  *) echo "install: unsupported profile: $profile" >&2; exit 1 ;;
+esac
+
+cd "$repo_root"
+git submodule update --init --recursive dotbot
+
+dotbot_bin="$repo_root/dotbot/bin/dotbot"
+if [[ ! -x "$dotbot_bin" ]]; then
+  echo "install: missing dotbot binary: $dotbot_bin" >&2
+  exit 1
+fi
+
+case "$mode" in
+  --check)
+    DOTFILES_PROFILE="$profile" ./scripts/check
+    DOTFILES_PROFILE="$profile" ./scripts/check-links
+    ;;
+  --sync-only)
+    DOTFILES_PROFILE="$profile" ./scripts/build-agents-md
+    DOTFILES_PROFILE="$profile" ./scripts/install-skills
+    DOTFILES_PROFILE="$profile" ./scripts/install-plugins
+    DOTFILES_PROFILE="$profile" ./scripts/install-mcp
+    DOTFILES_PROFILE="$profile" ./scripts/install-git-hooks
+    ;;
+  default)
+    DOTFILES_PROFILE="$profile" "$dotbot_bin" -d "$repo_root" -c install.conf.yaml
+    if [[ -f "profiles/$profile.conf.yaml" ]]; then
+      DOTFILES_PROFILE="$profile" "$dotbot_bin" -d "$repo_root" -c "profiles/$profile.conf.yaml"
+    fi
+    DOTFILES_PROFILE="$profile" ./scripts/install-git-hooks
+    DOTFILES_PROFILE="$profile" ./scripts/check-links
+    ;;
+esac

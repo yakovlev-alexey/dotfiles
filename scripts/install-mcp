@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h}
+profile=${DOTFILES_PROFILE:-}
+
+if [[ -z "$profile" ]]; then
+  case "$(uname -s)" in
+    Darwin) profile=macos ;;
+    Linux)
+      if grep -qi microsoft /proc/version 2>/dev/null; then profile=wsl; else profile=linux; fi
+      ;;
+    *) profile=unknown ;;
+  esac
+fi
+
+source "$repo_root/scripts/personal"
+personal_load_env
+
+node "$repo_root/scripts/lib/render-mcp-configs.mjs" "$repo_root" "$profile"

@@ -1,0 +1,2 @@
+- shell:
+  - [brew bundle --file=Brewfile, Installing Homebrew packages]

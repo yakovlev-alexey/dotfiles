@@ -1,0 +1,2 @@
+- shell:
+  - [./scripts/install-wsl-packages --check, Checking WSL package prerequisites]

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD |
+  grep -Eq '^(home/|ai/instructions/|install\.conf\.yaml|profiles/)'; then
+  ./scripts/check-links
+fi

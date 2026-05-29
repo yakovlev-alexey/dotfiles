@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+failed=0
+
+check_link() {
+  local live_path=$1
+  local repo_rel=$2
+  local expected="$repo_root/$repo_rel"
+
+  if [[ -L "$live_path" ]]; then
+    local actual
+    actual="$(readlink "$live_path")"
+    if [[ "$actual" != "$expected" ]]; then
+      printf 'link mismatch: %s\n  expected: %s\n  actual:   %s\n' "$live_path" "$expected" "$actual" >&2
+      failed=1
+    fi
+    return
+  fi
+
+  if [[ -e "$live_path" ]]; then
+    printf 'not a symlink: %s\n' "$live_path" >&2
+    if [[ -f "$live_path" && -f "$expected" ]]; then
+      diff -u "$expected" "$live_path" || true
+    fi
+    failed=1
+    return
+  fi
+
+  printf 'missing link: %s -> %s\n' "$live_path" "$expected" >&2
+  failed=1
+}
+
+check_link "$HOME/.zshrc" "home/zshrc"
+check_link "$HOME/.zprofile" "home/zprofile"
+check_link "$HOME/.bashrc" "home/bashrc"
+check_link "$HOME/.bash_profile" "home/bash_profile"
+check_link "$HOME/.gitconfig" "home/gitconfig"
+
+while IFS= read -r instruction; do
+  name="$(basename "$instruction")"
+  check_link "$HOME/.agents/instructions/$name" "ai/instructions/$name"
+done < <(find "$repo_root/ai/instructions" -maxdepth 1 -type f -name '*.md' | sort)
+
+if ((failed)); then
+  exit 1
+fi
+
+echo "check-links: ok"

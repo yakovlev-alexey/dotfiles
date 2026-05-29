@@ -1,0 +1,2 @@
+export DOTFILES_HOME="${DOTFILES_HOME:-$HOME/Repos/dotfiles}"
+[[ -r "$DOTFILES_HOME/shell/bash-common.sh" ]] && source "$DOTFILES_HOME/shell/bash-common.sh"

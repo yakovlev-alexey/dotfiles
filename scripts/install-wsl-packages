@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+required=(git zsh jq curl)
+missing=()
+for cmd in "${required[@]}"; do
+  command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
+done
+
+if [[ "${1:-}" == "--check" ]]; then
+  if ((${#missing[@]})); then
+    echo "install-wsl-packages: missing: ${missing[*]}" >&2
+    echo "install-wsl-packages: run sudo apt install git zsh jq curl wslu" >&2
+    exit 1
+  fi
+  echo "install-wsl-packages: prerequisites ok"
+  exit 0
+fi
+
+sudo apt update
+sudo apt install -y git zsh jq curl wslu build-essential

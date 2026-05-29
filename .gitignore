@@ -1,0 +1,16 @@
+.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+node_modules/
+.cache/
+.tmp/
+.local/
+logs/
+*.log
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+Brewfile.lock.json
+personal-store/

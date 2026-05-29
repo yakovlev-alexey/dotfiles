@@ -1,0 +1,40 @@
+[core]
+	editor = nvim
+	autocrlf = input
+	excludesfile = ~/.gitignore
+	precomposeunicode = true
+	quotepath = false
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true
+	ff = only
+
+[push]
+	default = current
+
+[diff]
+	noprefix = true
+	tool = nvimdiff
+
+[difftool "nvimdiff"]
+	cmd = nvim -d $BASE $LOCAL
+
+[merge]
+	tool = nvimdiff
+
+[mergetool "nvimdiff"]
+	cmd = nvim -d $BASE $LOCAL
+
+[alias]
+	co = checkout
+	st = status
+	di = diff
+	ci = commit
+	undo = reset --soft HEAD~1
+	hi = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+
+[include]
+	path = ~/.gitconfig.local

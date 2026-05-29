@@ -1,0 +1,264 @@
+#!/usr/bin/env zsh
+
+emulate -L zsh
+set -euo pipefail
+
+typeset -g _PERSONAL_SCRIPT_PATH="${${(%):-%x}:A}"
+typeset -g _PERSONAL_REPO_ROOT="${_PERSONAL_SCRIPT_PATH:h:h}"
+
+personal_die() {
+  print -u2 -- "$1"
+  return 1
+}
+
+personal_required_path() {
+  print -r -- "${PERSONAL_REQUIRED_PATH:-$_PERSONAL_REPO_ROOT/personal.required}"
+}
+
+personal_validate_name() {
+  local name=$1
+  [[ "$name" =~ '^[A-Z_][A-Z0-9_]*$' ]] || personal_die "personal: invalid variable name: $name"
+}
+
+personal_required_vars() {
+  local manifest_path line name
+  manifest_path=$(personal_required_path)
+  [[ -f "$manifest_path" ]] || personal_die "personal: missing required variables manifest: $manifest_path"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    name=${${line%%#*}//[[:space:]]/}
+    [[ -z "$name" ]] && continue
+    personal_validate_name "$name"
+    print -r -- "$name"
+  done < "$manifest_path"
+}
+
+personal_backend() {
+  if [[ -n "${PERSONAL_BACKEND:-}" ]]; then
+    print -r -- "$PERSONAL_BACKEND"
+    return
+  fi
+
+  if [[ "$OSTYPE" == darwin* ]] && command -v security >/dev/null 2>&1; then
+    print -r -- security
+    return
+  fi
+
+  print -r -- file
+}
+
+personal_file_store_dir() {
+  print -r -- "${PERSONAL_STORE_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/dotfiles/personal-store}"
+}
+
+personal_storage_get() {
+  local name=$1 backend file_path
+  personal_validate_name "$name"
+  backend=$(personal_backend)
+
+  case "$backend" in
+    security)
+      security find-generic-password -w -a "$USER" -D "environment variable" -s "$name" 2>/dev/null
+      ;;
+    file)
+      file_path="$(personal_file_store_dir)/$name"
+      [[ -r "$file_path" ]] || return 1
+      < "$file_path"
+      ;;
+    *)
+      personal_die "personal: unsupported backend: $backend"
+      ;;
+  esac
+}
+
+personal_storage_set() {
+  local name=$1 value=$2 backend dir file_path
+  personal_validate_name "$name"
+  backend=$(personal_backend)
+
+  case "$backend" in
+    security)
+      security add-generic-password -U -a "$USER" -D "environment variable" -s "$name" -w "$value" >/dev/null
+      ;;
+    file)
+      dir=$(personal_file_store_dir)
+      mkdir -p "$dir"
+      chmod 0700 "$dir"
+      file_path="$dir/$name"
+      print -rn -- "$value" > "$file_path"
+      chmod 0600 "$file_path"
+      ;;
+    *)
+      personal_die "personal: unsupported backend: $backend"
+      ;;
+  esac
+}
+
+personal_storage_unset() {
+  local name=$1 backend file_path
+  personal_validate_name "$name"
+  backend=$(personal_backend)
+
+  case "$backend" in
+    security)
+      security delete-generic-password -a "$USER" -D "environment variable" -s "$name" >/dev/null 2>&1 || true
+      ;;
+    file)
+      file_path="$(personal_file_store_dir)/$name"
+      rm -f "$file_path"
+      ;;
+    *)
+      personal_die "personal: unsupported backend: $backend"
+      ;;
+  esac
+}
+
+personal_has_env() {
+  local name=$1
+  personal_validate_name "$name"
+  [[ -n "${(P)name:-}" ]]
+}
+
+personal_get() {
+  local name=$1
+  personal_validate_name "$name"
+
+  if personal_has_env "$name"; then
+    print -r -- "${(P)name}"
+    return
+  fi
+
+  personal_storage_get "$name"
+}
+
+personal_load_env() {
+  local name value
+  for name in $(personal_required_vars); do
+    personal_has_env "$name" && continue
+    value=$(personal_storage_get "$name" 2>/dev/null) || continue
+    export "$name=$value"
+  done
+}
+
+personal_set() {
+  local name=${1:-} value
+  [[ -n "$name" ]] || personal_die "Usage: personal set NAME [VALUE]"
+  personal_validate_name "$name"
+
+  if (( $# >= 2 )); then
+    value=$2
+  else
+    print -n -- "Значение переменной $name: "
+    read -rs value
+    print
+  fi
+
+  [[ -n "$value" ]] || personal_die "personal: empty value for $name"
+  personal_storage_set "$name" "$value"
+}
+
+personal_unset() {
+  local name=${1:-}
+  [[ -n "$name" ]] || personal_die "Usage: personal unset NAME"
+  personal_storage_unset "$name"
+}
+
+personal_check() {
+  local name missing=0
+  for name in $(personal_required_vars); do
+    if personal_get "$name" >/dev/null 2>&1; then
+      print -r -- "$name: ok"
+    else
+      print -r -- "$name: missing"
+      missing=1
+    fi
+  done
+  (( missing == 0 )) || print -u2 -- "Run ./scripts/personal setup to fill missing values."
+  return "$missing"
+}
+
+personal_setup() {
+  local name value
+  print -r -- "Персональные значения будут сохранены вне git."
+  print
+
+  for name in $(personal_required_vars); do
+    if personal_storage_get "$name" >/dev/null 2>&1; then
+      print -r -- "$name: уже задано"
+      continue
+    fi
+
+    if personal_has_env "$name"; then
+      personal_storage_set "$name" "${(P)name}"
+      print -r -- "$name: сохранено из окружения"
+      continue
+    fi
+
+    print -n -- "Значение переменной $name: "
+    read -rs value
+    print
+    [[ -n "$value" ]] || personal_die "personal: empty value for $name"
+    personal_storage_set "$name" "$value"
+  done
+}
+
+personal_export() {
+  local name value
+  for name in $(personal_required_vars); do
+    value=$(personal_get "$name") || continue
+    print -r -- "export $name=${(qq)value}"
+  done
+}
+
+personal_configure_git() {
+  personal_load_env
+  [[ -n "${GIT_NAME:-}" ]] || personal_die "personal: GIT_NAME is required"
+  [[ -n "${GIT_EMAIL:-}" ]] || personal_die "personal: GIT_EMAIL is required"
+
+  cat > "$HOME/.gitconfig.local" <<GITCONFIG
+[user]
+	name = $GIT_NAME
+	email = $GIT_EMAIL
+GITCONFIG
+  chmod 0600 "$HOME/.gitconfig.local"
+}
+
+personal_usage() {
+  cat <<'USAGE'
+Usage: ./scripts/personal COMMAND [ARGS]
+
+Commands:
+  setup                 Ask for missing required values and store them.
+  check                 Verify required values are present.
+  set NAME [VALUE]      Store a value.
+  get NAME              Print a value.
+  unset NAME            Remove a stored value.
+  export                Print shell exports for required values.
+  configure-git         Write ~/.gitconfig.local from GIT_NAME/GIT_EMAIL.
+USAGE
+}
+
+personal_main() {
+  local command=${1:-}
+  [[ -n "$command" ]] || {
+    personal_usage
+    return 1
+  }
+  shift
+
+  case "$command" in
+    setup) personal_setup "$@" ;;
+    check) personal_check "$@" ;;
+    set) personal_set "$@" ;;
+    get) personal_get "$@" ;;
+    unset) personal_unset "$@" ;;
+    export) personal_export "$@" ;;
+    configure-git) personal_configure_git "$@" ;;
+    help|--help|-h) personal_usage ;;
+    *) personal_die "personal: unknown command: $command" ;;
+  esac
+}
+
+if [[ "${ZSH_EVAL_CONTEXT:-}" != *:file ]]; then
+  personal_main "$@"
+fi
