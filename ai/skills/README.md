@@ -1,9 +1,9 @@
 # Skills
 
-Локальные skills лежат рядом с этим файлом как директории с `SKILL.md`.
-Внешние или local-source skills описываются в `skills.json`.
+Local skills live next to this file as directories with `SKILL.md`.
+External or local-source skills are described in `skills.json`.
 
-После изменения запусти:
+After making changes, run:
 
 ```bash
 ./scripts/install-skills

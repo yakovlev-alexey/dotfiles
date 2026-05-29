@@ -1,8 +1,8 @@
 # dotfiles
 
-Персональные dotfiles для macOS и WSL. Репозиторий является source of truth, live-конфиги в домашнем каталоге считаются generated/runtime слоем.
+Personal dotfiles for macOS and WSL. This repository is the source of truth; live configs in the home directory are treated as the generated/runtime layer.
 
-## Быстрый старт
+## Quick Start
 
 ```bash
 git clone --recursive <repo-url> ~/Repos/dotfiles
@@ -11,7 +11,7 @@ cd ~/Repos/dotfiles
 ./install --profile macos
 ```
 
-Для WSL:
+For WSL:
 
 ```bash
 git clone --recursive <repo-url> ~/Repos/dotfiles
@@ -20,20 +20,20 @@ PERSONAL_BACKEND=file ./scripts/personal setup
 ./install --profile wsl
 ```
 
-## Что управляется
+## Managed
 
-- shell: `zsh`, fallback `bash`, общие aliases/functions;
-- Git: общий `.gitconfig` + generated `~/.gitconfig.local` из `scripts/personal`;
-- Codex/Cursor/OpenCode skills через общий слой `~/.agents/skills`;
-- MCP registry из `ai/mcp.json` с генерацией client-specific конфигов;
-- `AGENTS.md` для agent-директорий генерируется из `ai/instructions/*.md`;
-- Homebrew inventory для macOS.
+- shell: `zsh`, fallback `bash`, shared aliases/functions;
+- Git: shared `.gitconfig` plus generated `~/.gitconfig.local` from `scripts/personal`;
+- Codex/Cursor/OpenCode skills through the shared `~/.agents/skills` layer;
+- MCP registry from `ai/mcp.json`, with generated client-specific configs;
+- `AGENTS.md` for agent directories is generated from `ai/instructions/*.md`;
+- Homebrew inventory for macOS.
 
-## Что не управляется
+## Not Managed
 
-Не коммитятся и не линкуются секреты, токены, history, sessions, sqlite, IDE extensions, app caches, `node_modules`, `~/.ssh` private keys, `.arc`/`.ya` runtime state, Codex worktrees и runtime/cache директории.
+Secrets, tokens, history, sessions, sqlite files, IDE extensions, app caches, `node_modules`, `~/.ssh` private keys, `.arc`/`.ya` runtime state, Codex worktrees, and runtime/cache directories are not committed or linked.
 
-## Частые команды
+## Common Commands
 
 ```bash
 ./install --profile macos
@@ -46,25 +46,21 @@ PERSONAL_BACKEND=file ./scripts/personal setup
 ./scripts/check-links
 ```
 
-`./install` устанавливает git hooks репозитория и запускает
-`./scripts/check-links` после обычной установки. `./install --check` запускает и
-статические проверки репозитория, и проверку live symlink-ов. Git hooks повторно
-запускают проверку ссылок после pull/merge или checkout ветки, если менялись
-управляемые источники ссылок.
+`./install` installs repository git hooks and runs `./scripts/check-links` after a normal installation. `./install --check` runs both repository static checks and live symlink checks. Git hooks rerun the link check after pull/merge or branch checkout when managed link sources have changed.
 
-## Добавление нового MCP
+## Adding a New MCP
 
-1. Добавить сервер в `ai/mcp.json`.
-2. Если нужны секреты, добавить имя переменной в `personal.required`.
-3. Запустить `./scripts/install-mcp`.
-4. Проверить `./scripts/check`.
+1. Add the server to `ai/mcp.json`.
+2. If secrets are required, add the variable name to `personal.required`.
+3. Run `./scripts/install-mcp`.
+4. Verify with `./scripts/check`.
 
-## Добавление нового skill
+## Adding a New Skill
 
-- локальный skill: положить в `ai/skills/<name>/SKILL.md`;
-- внешний/local source: добавить запись в `ai/skills/skills.json`.
+- local skill: place it in `ai/skills/<name>/SKILL.md`;
+- external/local source: add an entry to `ai/skills/skills.json`.
 
-Затем:
+Then:
 
 ```bash
 ./scripts/install-skills
@@ -72,4 +68,4 @@ PERSONAL_BACKEND=file ./scripts/personal setup
 
 ## AGENTS.md
 
-`AGENTS.md` не хранится отдельно для Codex. Канон — `ai/instructions/*.md`. Скрипт `./scripts/build-agents-md` собирает inline `AGENTS.md` с содержимым всех instruction-файлов и раскладывает его в `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.cursor/AGENTS.md` и `~/.config/opencode/AGENTS.md`.
+`AGENTS.md` is not stored separately for Codex. The canonical source is `ai/instructions/*.md`. The `./scripts/build-agents-md` script builds an inline `AGENTS.md` with the contents of all instruction files and places it in `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.cursor/AGENTS.md`, and `~/.config/opencode/AGENTS.md`.

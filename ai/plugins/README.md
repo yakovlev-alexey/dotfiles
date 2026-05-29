@@ -1,4 +1,4 @@
 # Plugins
 
-`plugins.json` зарезервирован под локальные Codex plugin wrappers.
-Сейчас локальные плагины не канонизируются: установленные bundled/curated плагины Codex управляются самим Codex.
+`plugins.json` is reserved for local Codex plugin wrappers.
+Local plugins are not canonicalized yet: installed bundled/curated Codex plugins are managed by Codex itself.

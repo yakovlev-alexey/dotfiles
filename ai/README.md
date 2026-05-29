@@ -1,11 +1,11 @@
 # AI config layer
 
-`ai/` — канонический слой для инструкций, skills, plugins и MCP.
+`ai/` is the canonical layer for instructions, skills, plugins, and MCP.
 
-- `instructions/*.md` линкуются в `~/.agents/instructions`.
-- `scripts/build-agents-md` генерирует inline `AGENTS.md` для `~/.agents`, Codex, Cursor и OpenCode.
-- `skills/*` и `skills/skills.json` собираются в `~/.agents/skills`.
-- `plugins/plugins.json` зарезервирован под local Codex marketplace.
-- `mcp.json` генерирует live-конфиги Cursor, OpenCode и Codex.
+- `instructions/*.md` are linked into `~/.agents/instructions`.
+- `scripts/build-agents-md` generates inline `AGENTS.md` files for `~/.agents`, Codex, Cursor, and OpenCode.
+- `skills/*` and `skills/skills.json` are assembled into `~/.agents/skills`.
+- `plugins/plugins.json` is reserved for the local Codex marketplace.
+- `mcp.json` generates live configs for Cursor, OpenCode, and Codex.
 
-Live-конфиги в home не редактируются вручную, а пересобираются через `./scripts/install-mcp`.
+Live configs in the home directory are not edited manually; they are rebuilt through `./scripts/install-mcp`.
