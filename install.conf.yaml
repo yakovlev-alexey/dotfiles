@@ -19,6 +19,7 @@
       glob: true
       path: home/*
       prefix: '.'
+    ~/.config/starship.toml: config/starship.toml
     ~/.agents/instructions/:
       glob: true
       path: ai/instructions/*.md

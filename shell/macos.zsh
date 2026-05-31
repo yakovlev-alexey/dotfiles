@@ -20,12 +20,6 @@ if [[ -s "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting
   source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
-if (( $+functions[promptinit] == 0 )); then
-  autoload -U promptinit
-fi
-promptinit
-prompt pure 2>/dev/null || true
-
 export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;

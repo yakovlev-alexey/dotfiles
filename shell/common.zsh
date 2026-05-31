@@ -3,6 +3,11 @@ export VISUAL="${VISUAL:-$EDITOR}"
 export LANG="${LANG:-en_US.UTF-8}"
 export LC_ALL="${LC_ALL:-en_US.UTF-8}"
 
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
 setopt hist_ignore_all_dups append_history hist_ignore_space share_history
 HISTFILE="${HISTFILE:-$HOME/.zsh_history}"
 HISTSIZE="${HISTSIZE:-50000}"

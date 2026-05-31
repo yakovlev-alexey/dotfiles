@@ -18,17 +18,19 @@ git clone --recursive <repo-url> ~/Repos/dotfiles
 cd ~/Repos/dotfiles
 PERSONAL_BACKEND=file ./scripts/personal setup
 ./install --profile wsl
+chsh -s "$(command -v zsh)"
 ```
 
 ## Managed
 
 - shell: `zsh`, fallback `bash`, shared aliases/functions;
+- prompt: Starship with managed `~/.config/starship.toml`;
 - Git: shared `.gitconfig` plus generated `~/.gitconfig.local` from `scripts/personal`;
 - Codex/Cursor/OpenCode skills through the shared `~/.agents/skills` layer;
 - MCP registry from `ai/mcp.json`, with generated client-specific configs;
 - `AGENTS.md` for agent directories is generated from `ai/instructions/*.md`;
 - Homebrew inventory for macOS.
-- WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, and `pnpm`;
+- WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, `pnpm`, and Starship;
 - Windows agent projection from WSL into the Windows user profile for `AGENTS.md`, skills, and local plugin metadata.
 
 ## Not Managed
@@ -92,4 +94,16 @@ For Codex Desktop on Windows, configure the app itself to run the agent in WSL: 
 ```powershell
 wsl -l -v
 wsl --set-default Ubuntu
+```
+
+If Windows Terminal opens Ubuntu with `bash`, change the Ubuntu login shell from an interactive Ubuntu terminal:
+
+```bash
+chsh -s "$(command -v zsh)"
+```
+
+Then restart the distribution from PowerShell:
+
+```powershell
+wsl --terminate Ubuntu
 ```

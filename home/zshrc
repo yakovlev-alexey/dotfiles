@@ -19,3 +19,7 @@ esac
 
 [[ -r "$DOTFILES_HOME/shell/aliases.zsh" ]] && source "$DOTFILES_HOME/shell/aliases.zsh"
 [[ -r "$DOTFILES_HOME/shell/functions.zsh" ]] && source "$DOTFILES_HOME/shell/functions.zsh"
+
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi

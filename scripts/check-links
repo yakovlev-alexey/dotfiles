@@ -37,6 +37,7 @@ check_link "$HOME/.zprofile" "home/zprofile"
 check_link "$HOME/.bashrc" "home/bashrc"
 check_link "$HOME/.bash_profile" "home/bash_profile"
 check_link "$HOME/.gitconfig" "home/gitconfig"
+check_link "$HOME/.config/starship.toml" "config/starship.toml"
 
 while IFS= read -r instruction; do
   name="$(basename "$instruction")"

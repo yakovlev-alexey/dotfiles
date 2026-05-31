@@ -23,6 +23,10 @@ fi
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
 case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
@@ -40,7 +44,7 @@ has_nvm() {
 missing_prerequisites() {
   local missing=() cmd
 
-  for cmd in git zsh jq curl rg; do
+  for cmd in git zsh jq curl rg starship; do
     command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
   done
 
@@ -93,6 +97,7 @@ apt_packages=(
   python3-venv
   pyenv
   sd
+  starship
   yq
   zsh-syntax-highlighting
 )
@@ -158,6 +163,17 @@ if command -v corepack >/dev/null 2>&1; then
 elif command -v npm >/dev/null 2>&1; then
   npm install --global "pnpm@${PNPM_VERSION:-latest}"
 fi
+
+install_starship() {
+  if command -v starship >/dev/null 2>&1; then
+    return
+  fi
+
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin"
+}
+
+install_starship
 
 if command -v pipx >/dev/null 2>&1; then
   pipx ensurepath || true
