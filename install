@@ -54,6 +54,11 @@ case "$profile" in
 esac
 
 cd "$repo_root"
+
+if [[ "$profile" == wsl ]]; then
+  ./scripts/install-wsl-packages --ensure
+fi
+
 git submodule update --init --recursive dotbot
 
 dotbot_bin="$repo_root/dotbot/bin/dotbot"
@@ -72,6 +77,9 @@ case "$mode" in
     DOTFILES_PROFILE="$profile" ./scripts/install-skills
     DOTFILES_PROFILE="$profile" ./scripts/install-plugins
     DOTFILES_PROFILE="$profile" ./scripts/install-mcp
+    if [[ "$profile" == wsl ]]; then
+      DOTFILES_PROFILE="$profile" bash ./scripts/install-windows-agent-projection
+    fi
     DOTFILES_PROFILE="$profile" ./scripts/install-git-hooks
     ;;
   default)

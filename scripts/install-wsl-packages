@@ -1,21 +1,177 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-required=(git zsh jq curl)
-missing=()
-for cmd in "${required[@]}"; do
-  command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
+mode="${1:-install}"
+case "$mode" in
+  install|--check|--ensure|--help|-h) ;;
+  *)
+    echo "install-wsl-packages: unknown argument: $mode" >&2
+    exit 1
+    ;;
+esac
+
+if [[ "$mode" == "--help" || "$mode" == "-h" ]]; then
+  cat <<'USAGE'
+Usage: ./scripts/install-wsl-packages [--check|--ensure]
+
+Installs WSL package prerequisites, Ubuntu/Debian analogs for Brewfile tools,
+nvm, an LTS Node.js via nvm, and pnpm.
+USAGE
+  exit 0
+fi
+
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+source_nvm() {
+  [[ -s "$NVM_DIR/nvm.sh" ]] && . "$NVM_DIR/nvm.sh"
+  return 0
+}
+
+has_nvm() {
+  source_nvm
+  command -v nvm >/dev/null 2>&1
+}
+
+missing_prerequisites() {
+  local missing=() cmd
+
+  for cmd in git zsh jq curl rg; do
+    command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
+  done
+
+  source_nvm
+  for cmd in node npm npx pnpm; do
+    command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
+  done
+
+  has_nvm || missing+=(nvm)
+  if ((${#missing[@]})); then
+    printf '%s\n' "${missing[@]}"
+  fi
+}
+
+apt_packages=(
+  git
+  zsh
+  jq
+  curl
+  wslu
+  build-essential
+  ripgrep
+
+  # Brewfile equivalents available through Ubuntu/Debian packages when present.
+  bat
+  bison
+  brotli
+  cmake
+  docker.io
+  docker-buildx
+  docker-buildx-plugin
+  docker-compose-v2
+  eza
+  fd-find
+  flex
+  fzf
+  gh
+  golang-go
+  libpcap-dev
+  libssh2-1-dev
+  llvm
+  mingw-w64
+  neovim
+  pipx
+  poetry
+  poppler-utils
+  postgresql-client
+  python3
+  python3-pip
+  python3-venv
+  pyenv
+  sd
+  yq
+  zsh-syntax-highlighting
+)
+
+available=()
+unavailable=()
+installable=()
+for package in "${apt_packages[@]}"; do
+  if apt-cache show "$package" >/dev/null 2>&1; then
+    available+=("$package")
+    if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed'; then
+      installable+=("$package")
+    fi
+  else
+    unavailable+=("$package")
+  fi
 done
 
-if [[ "${1:-}" == "--check" ]]; then
+mapfile -t missing < <(missing_prerequisites)
+
+if [[ "$mode" == "--check" ]]; then
   if ((${#missing[@]})); then
     echo "install-wsl-packages: missing: ${missing[*]}" >&2
-    echo "install-wsl-packages: run sudo apt install git zsh jq curl wslu" >&2
+    echo "install-wsl-packages: run ./scripts/install-wsl-packages" >&2
     exit 1
   fi
   echo "install-wsl-packages: prerequisites ok"
   exit 0
 fi
 
-sudo apt update
-sudo apt install -y git zsh jq curl wslu build-essential
+if [[ "$mode" == "--ensure" && ${#missing[@]} -eq 0 && ${#installable[@]} -eq 0 ]]; then
+  echo "install-wsl-packages: prerequisites ok"
+  exit 0
+fi
+
+if ((${#installable[@]})); then
+  sudo apt update
+  sudo apt install -y "${installable[@]}"
+fi
+
+install_nvm() {
+  local version=${NVM_INSTALL_VERSION:-v0.40.4}
+  if has_nvm; then
+    return
+  fi
+
+  mkdir -p "$NVM_DIR"
+  curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/${version}/install.sh" | PROFILE=/dev/null bash
+  source_nvm
+}
+
+install_nvm
+
+if has_nvm; then
+  nvm install --lts
+  nvm alias default 'lts/*'
+  nvm use default
+fi
+
+if command -v corepack >/dev/null 2>&1; then
+  corepack enable
+  corepack prepare "pnpm@${PNPM_VERSION:-latest}" --activate
+elif command -v npm >/dev/null 2>&1; then
+  npm install --global "pnpm@${PNPM_VERSION:-latest}"
+fi
+
+if command -v pipx >/dev/null 2>&1; then
+  pipx ensurepath || true
+fi
+
+if ((${#unavailable[@]})); then
+  echo "install-wsl-packages: no apt candidate for: ${unavailable[*]}" >&2
+  echo "install-wsl-packages: install these separately if you need them on this Ubuntu release." >&2
+fi
+
+mapfile -t missing < <(missing_prerequisites)
+if ((${#missing[@]})); then
+  echo "install-wsl-packages: still missing after install: ${missing[*]}" >&2
+  exit 1
+fi
+
+echo "install-wsl-packages: installed prerequisites"

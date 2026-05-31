@@ -71,7 +71,11 @@ if [[ -f "$registry_path" ]]; then
   while IFS= read -r entry; do
     source=$(normalize_source "$(jq -r '.key' <<<"$entry")")
     if [[ "$source" == /* && ! -e "$source" ]]; then
-      die "install-skills: missing local skill source: $source"
+      if [[ "${INSTALL_SKILLS_STRICT:-0}" == 1 ]]; then
+        die "install-skills: missing local skill source: $source"
+      fi
+      print -u2 "install-skills: skipping missing local skill source: $source"
+      continue
     fi
     value_type=$(jq -r '.value | type' <<<"$entry")
     names=()

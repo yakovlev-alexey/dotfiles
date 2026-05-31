@@ -1,2 +1,4 @@
 - shell:
   - [./scripts/install-wsl-packages --check, Checking WSL package prerequisites]
+  - [bash ./scripts/install-windows-agent-projection --check, Checking Windows agent projection]
+  - [bash ./scripts/install-windows-agent-projection, Syncing Windows agent projection]

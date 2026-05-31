@@ -28,6 +28,8 @@ PERSONAL_BACKEND=file ./scripts/personal setup
 - MCP registry from `ai/mcp.json`, with generated client-specific configs;
 - `AGENTS.md` for agent directories is generated from `ai/instructions/*.md`;
 - Homebrew inventory for macOS.
+- WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, and `pnpm`;
+- Windows agent projection from WSL into the Windows user profile for `AGENTS.md`, skills, and local plugin metadata.
 
 ## Not Managed
 
@@ -41,6 +43,8 @@ Secrets, tokens, history, sessions, sqlite files, IDE extensions, app caches, `n
 ./scripts/build-agents-md
 ./scripts/install-skills
 ./scripts/install-mcp
+./scripts/install-wsl-packages
+bash ./scripts/install-windows-agent-projection
 ./scripts/install-git-hooks
 ./scripts/check
 ./scripts/check-links
@@ -69,3 +73,23 @@ Then:
 ## AGENTS.md
 
 `AGENTS.md` is not stored separately for Codex. The canonical source is `ai/instructions/*.md`. The `./scripts/build-agents-md` script builds an inline `AGENTS.md` with the contents of all instruction files and places it in `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.cursor/AGENTS.md`, and `~/.config/opencode/AGENTS.md`.
+
+## Windows Agents From WSL
+
+On WSL, `./install --profile wsl` also runs `bash ./scripts/install-windows-agent-projection` when Windows interop is available. This copies generated agent runtime files into the Windows user profile:
+
+```text
+C:\Users\<you>\.agents
+C:\Users\<you>\.codex
+C:\Users\<you>\.cursor
+C:\Users\<you>\.config\opencode
+```
+
+The projection copies `AGENTS.md`, skills, and local plugin metadata. It deliberately does not copy generated MCP/client config files because WSL configs can contain Linux commands and paths that are not valid for Windows-native agent processes.
+
+For Codex Desktop on Windows, configure the app itself to run the agent in WSL: Settings -> Agent -> WSL, then restart the app. The integrated terminal is configured separately; choose WSL there too if you want new terminal sessions to open in Ubuntu. If multiple WSL distributions are installed, make Ubuntu the default from PowerShell:
+
+```powershell
+wsl -l -v
+wsl --set-default Ubuntu
+```

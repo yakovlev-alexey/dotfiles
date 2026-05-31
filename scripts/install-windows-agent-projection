@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: ./scripts/install-windows-agent-projection [--check]
+
+Copies generated WSL agent runtime files into the Windows user profile so
+Windows-native Codex/Cursor/OpenCode can see the same AGENTS.md and skills.
+USAGE
+}
+
+die() {
+  echo "$1" >&2
+  exit 1
+}
+
+is_wsl() {
+  grep -qi microsoft /proc/version 2>/dev/null
+}
+
+windows_home() {
+  command -v powershell.exe >/dev/null 2>&1 || return 1
+
+  local win_path
+  win_path="$(powershell.exe -NoProfile -Command '[Environment]::GetFolderPath("UserProfile")' | tr -d '\r')"
+  [[ -n "$win_path" ]] || return 1
+  wslpath -u "$win_path"
+}
+
+copy_file() {
+  local src=$1 dst=$2
+  [[ -f "$src" ]] || die "install-windows-agent-projection: missing file: $src"
+  mkdir -p "$(dirname "$dst")"
+  cp "$src" "$dst"
+  echo "install-windows-agent-projection: synced $dst"
+}
+
+copy_dir_contents() {
+  local src=$1 dst=$2 win_home=$3
+  [[ -d "$src" ]] || die "install-windows-agent-projection: missing directory: $src"
+
+  case "$dst" in
+    "$win_home"/.agents/skills|"$win_home"/.codex/skills|"$win_home"/.cursor/skills|"$win_home"/.codex/plugins/dotfiles-local) ;;
+    *) die "install-windows-agent-projection: refusing to replace unexpected path: $dst" ;;
+  esac
+
+  rm -rf "$dst"
+  mkdir -p "$dst"
+  cp -RL "$src"/. "$dst"/
+  echo "install-windows-agent-projection: synced $dst"
+}
+
+mode="${1:-}"
+case "$mode" in
+  ""|--check) ;;
+  --help|-h)
+    usage
+    exit 0
+    ;;
+  *)
+    die "install-windows-agent-projection: unknown argument: $mode"
+    ;;
+esac
+
+if ! is_wsl; then
+  echo "install-windows-agent-projection: not running under WSL; skipped"
+  exit 0
+fi
+
+win_home="$(windows_home || true)"
+if [[ -z "$win_home" ]]; then
+  echo "install-windows-agent-projection: Windows interop unavailable; skipped"
+  exit 0
+fi
+
+if [[ "$mode" == "--check" ]]; then
+  echo "install-windows-agent-projection: Windows home is $win_home"
+  exit 0
+fi
+
+copy_file "$HOME/.agents/AGENTS.md" "$win_home/.agents/AGENTS.md"
+copy_file "$HOME/.codex/AGENTS.md" "$win_home/.codex/AGENTS.md"
+copy_file "$HOME/.cursor/AGENTS.md" "$win_home/.cursor/AGENTS.md"
+copy_file "$HOME/.config/opencode/AGENTS.md" "$win_home/.config/opencode/AGENTS.md"
+
+copy_dir_contents "$HOME/.agents/skills" "$win_home/.agents/skills" "$win_home"
+copy_dir_contents "$HOME/.codex/skills" "$win_home/.codex/skills" "$win_home"
+copy_dir_contents "$HOME/.cursor/skills" "$win_home/.cursor/skills" "$win_home"
+
+if [[ -f "$HOME/.agents/plugins/marketplace.json" ]]; then
+  copy_file "$HOME/.agents/plugins/marketplace.json" "$win_home/.agents/plugins/marketplace.json"
+fi
+
+if [[ -d "$HOME/.codex/plugins/dotfiles-local" ]]; then
+  copy_dir_contents "$HOME/.codex/plugins/dotfiles-local" "$win_home/.codex/plugins/dotfiles-local" "$win_home"
+fi
