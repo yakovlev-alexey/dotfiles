@@ -2,6 +2,8 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias l='ls -la'
 alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
 alias vd='nvim -d'
 
 alias st='git status'

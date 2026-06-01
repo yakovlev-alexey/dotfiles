@@ -23,6 +23,8 @@
     ~/.agents/instructions/:
       glob: true
       path: ai/instructions/*.md
+    ~/.config/nvim: config/nvim
+    ~/.config/ghostty: config/ghostty
 
 - shell:
   - [./scripts/personal check, Checking personal variables]
