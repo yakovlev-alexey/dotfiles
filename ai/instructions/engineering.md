@@ -6,6 +6,8 @@ Read existing code and configuration before changing anything. Prefer local proj
 
 Make reasonable small changes directly. For large, risky, or ambiguous work, propose a short plan first.
 
+When a plan includes adding new UI elements or moving existing UI elements, include a compact ASCII layout sketch showing the intended interface structure before implementation.
+
 Ask before adding new dependencies, doing large refactors, changing exported package APIs, changing documented endpoints, or creating database migrations.
 
 When uncertain, first inspect code and docs, then state assumptions and ask the user. Do not make broad decisions silently.
