@@ -2,11 +2,11 @@
   "tracker": {
     "enabled": true,
     "transport": "local",
-    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "command": "ya",
     "args": [
-      "-F",
-      "$HOME/.mcp_store/oauth_token",
-      "--endpoint",
+      "tool",
+      "mcp",
+      "connect",
       "mcp.yandex.net/ws?servers=tracker_mcp"
     ],
     "clients": {
@@ -24,11 +24,11 @@
   "intrasearch": {
     "enabled": true,
     "transport": "local",
-    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "command": "ya",
     "args": [
-      "-F",
-      "$HOME/.mcp_store/oauth_token",
-      "--endpoint",
+      "tool",
+      "mcp",
+      "connect",
       "mcp.yandex.net/ws?servers=intrasearch"
     ],
     "clients": {
@@ -46,11 +46,11 @@
   "arcanum": {
     "enabled": true,
     "transport": "local",
-    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "command": "ya",
     "args": [
-      "-F",
-      "$HOME/.mcp_store/oauth_token",
-      "--endpoint",
+      "tool",
+      "mcp",
+      "connect",
       "mcp.yandex.net/ws?servers=arcanum"
     ],
     "clients": {
@@ -68,11 +68,11 @@
   "devtools": {
     "enabled": true,
     "transport": "local",
-    "command": "$HOME/arcadia/ml/infra/model_context_protocol/tools/proxy_client/proxy_client",
+    "command": "ya",
     "args": [
-      "-F",
-      "$HOME/.mcp_store/oauth_token",
-      "--endpoint",
+      "tool",
+      "mcp",
+      "connect",
       "mcp.yandex.net/ws?servers=devtools"
     ],
     "clients": {
