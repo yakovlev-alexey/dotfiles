@@ -17,14 +17,14 @@ The Agentlytics relay is local-only. For this workflow, broad local searches acr
 
 1. Check whether the Agentlytics MCP server is available in the current session.
    - Prefer a cheap MCP call first: `get_user_activity` for a known username/project, or `search_sessions` for a known local project name.
-   - If Agentlytics MCP tools are missing or return connection errors, tell the user to start the local relay:
+   - If Agentlytics MCP tools are missing or return connection errors, do not inspect the installed package, probe REST endpoints, search local source, or spend time debugging tool registration. Start the local relay immediately:
 
 ```bash
 agentlytics --relay
 ```
 
 2. Check that history has been joined/synchronized.
-   - If the database appears empty, if known usernames/projects return no activity, or if only stale data appears, ask for the username and tell the user to run:
+   - After starting the relay, if the database appears empty, if known usernames/projects return no activity, or if only stale data appears, ask for the username if it is not already known and run the join command immediately:
 
 ```bash
 agentlytics --join 192.168.1.164:4638 --username <username>
@@ -34,6 +34,9 @@ agentlytics --join 192.168.1.164:4638 --username <username>
    - Because the relay is strictly local, `list_users` is acceptable for discovery.
    - If a known username fails, use `search_sessions` without `username` for relevant project names, folder segments, or distinctive terms.
    - Once a real username is found, prefer scoped calls with that username.
+
+Operational rule:
+- Treat `agentlytics --relay` and, when needed, `agentlytics --join 192.168.1.164:4638 --username <username>` as the prescribed setup path. Do not substitute package inspection, endpoint probing, CLI help spelunking, or alternative discovery unless these commands fail after being run.
 
 ## Date Range
 
