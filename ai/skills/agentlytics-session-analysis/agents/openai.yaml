@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agentlytics Session Analysis"
+  short_description: "Analyze today's agentic coding sessions"
+  default_prompt: "Use $agentlytics-session-analysis to inspect today's Agentlytics sessions, score prompt quality and agent trajectories, and suggest concrete prompt rewrites and workflow improvements."
