@@ -22,16 +22,15 @@ For each session, return exactly this structure:
 
 SESSION: <id or name>
 TYPE: <debug | UI | feature | planning | explore | review | CI/release | config/devex | other>
-SCORE: <1-10>
 CONFIDENCE: <high | medium | low>
 DIMENSIONS:
-- goal_clarity: <1-5> - <one sentence>
-- context_quality: <1-5> - <one sentence>
-- scope_control: <1-5> - <one sentence>
-- trajectory_efficiency: <1-5> - <one sentence>
-- correction_quality: <1-5> - <one sentence>
-- verification_rigor: <1-5> - <one sentence>
-- outcome: <1-5> - <one sentence>
+- goal_clarity: <qualitative feedback sentence>
+- context_quality: <qualitative feedback sentence>
+- scope_control: <qualitative feedback sentence>
+- trajectory_efficiency: <qualitative feedback sentence>
+- correction_quality: <qualitative feedback sentence>
+- verification_rigor: <qualitative feedback sentence>
+- outcome: <qualitative feedback sentence>
 EVIDENCE:
 - <2-4 concrete transcript facts; quote only short fragments, prefer paraphrase>
 STRENGTH:
@@ -53,6 +52,7 @@ BATCH_PATTERNS:
 
 Rules:
 - Do not produce a chronological summary.
+- Do not use numeric ratings or scores.
 - Do not invent missing evidence; mark confidence low when the transcript is truncated or redacted.
 - Do not recommend broad AGENTS.md or skill rules from one isolated session.
 - Do not expose secrets, tokens, private keys, or sensitive personal data.

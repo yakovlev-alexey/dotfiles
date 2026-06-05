@@ -11,20 +11,40 @@ Use this skill to make Agentlytics ready for analysis: relay reachable, MCP tool
 
 The Agentlytics relay is local-only. Broad local searches across all users are allowed only to discover the correct username, project path, or session ids.
 
-**NEXT SKILL:** After setup succeeds, use `agentlytics-session-analysis` for date filtering, session selection, scoring, prompt rewrites, and coaching.
+**NEXT SKILL:** After setup succeeds, use `agentlytics-session-analysis` for date filtering, session selection, qualitative feedback, prompt rewrites, and coaching.
 
 ## Setup Workflow
 
 1. Check whether Agentlytics MCP tools are visible.
    - Prefer a cheap MCP call first: `get_user_activity` for a known username/project, or `search_sessions` for a known local project name.
-   - If tools are missing or return connection errors, start the relay immediately:
+   - If tools are missing or return connection errors, choose the relay command by checking the local environment:
+
+```bash
+command -v agentlytics
+command -v pnpx
+```
+
+   - If `agentlytics` exists, start the relay with:
 
 ```bash
 agentlytics --relay
 ```
 
-   - Do not inspect the installed package, probe REST endpoints, search local source, or debug tool registration before trying the prescribed relay path.
-   - If the runtime uses sandboxing, approval gates, or restricted local networking, request an unsandboxed/elevated local process before running the relay. Binding to `localhost:4638` can fail inside sandboxes.
+   - If `agentlytics` is missing and `pnpx` exists, start the relay with:
+
+```bash
+pnpx --allow-build=better-sqlite3 agentlytics --relay
+```
+
+   - If both `agentlytics` and `pnpx` are missing, use:
+
+```bash
+npx agentlytics --relay
+```
+
+   - Use the same command prefix for later `--join` calls: `agentlytics`, `pnpx --allow-build=better-sqlite3 agentlytics`, or `npx agentlytics`.
+   - Do not inspect the installed package, probe REST endpoints, search local source, or debug tool registration before trying the selected relay path.
+   - If the runtime uses sandboxing, approval gates, or restricted local networking, request an unsandboxed/elevated local process before checking commands or running the relay. Binding to `localhost:4638` can fail inside sandboxes.
    - Portable approval wording: "Allow starting the local Agentlytics relay so it can bind to localhost:4638?"
    - In Codex, use `sandbox_permissions: require_escalated`.
 
@@ -40,6 +60,13 @@ agentlytics --relay
 agentlytics --join localhost:4638 --username <username>
 ```
 
+   - If setup used `pnpx` or `npx`, run the equivalent join command with the same prefix:
+
+```bash
+pnpx --allow-build=better-sqlite3 agentlytics --join localhost:4638 --username <username>
+npx agentlytics --join localhost:4638 --username <username>
+```
+
    - This is mandatory even when the database is non-empty, because the local database can be stale.
    - If the runtime uses sandboxing, approval gates, or restricted local networking, request an unsandboxed/elevated local process for this command too.
    - Portable approval wording: "Allow Agentlytics to join the local relay and synchronize session history for <username>?"
@@ -51,8 +78,8 @@ agentlytics --join localhost:4638 --username <username>
 
 ## Operational Rules
 
-- Never start session analysis before `agentlytics --join localhost:4638 --username <username>` has run successfully in the current workflow.
-- Treat `agentlytics --relay` and `agentlytics --join localhost:4638 --username <username>` as the setup path.
+- Never start session analysis before the selected `--join localhost:4638 --username <username>` command has run successfully in the current workflow.
+- Treat `command -v agentlytics`, `command -v pnpx`, the selected `--relay` command, and the matching `--join` command as the setup path.
 - Do not substitute package inspection, endpoint probing, CLI help spelunking, or alternative discovery unless the prescribed commands fail after the runtime's required approval/elevation.
 - Use Agentlytics MCP tools for discovery and details.
 - Do not fall back to `curl`, local REST endpoints, or printed relay URLs by default.
@@ -72,7 +99,7 @@ When setup succeeds, pass these facts into `agentlytics-session-analysis`:
 
 - Do not treat a non-empty database as fresh enough. Run join anyway.
 - Do not use broad user discovery as permission to analyze across users.
-- Do not debug Agentlytics internals before running the relay and join commands.
+- Do not debug Agentlytics internals before checking command availability and running the selected relay and join commands.
 - Do not use REST fallback without explicit user approval.
 - Do not stop after setup when the user asked for analysis; hand off to `agentlytics-session-analysis`.
 - Do not edit this skill without running the pressure scenarios in `pressure-scenarios.md`.

@@ -27,7 +27,8 @@ Proceed with the task. Say the next command or tool action you would take and wh
 
 ### Expected GREEN behavior
 
-- Start the prescribed relay path with `agentlytics --relay`.
+- Check command availability first with `command -v agentlytics` and `command -v pnpx`.
+- Start the prescribed relay path with `agentlytics --relay`, `pnpx --allow-build=better-sqlite3 agentlytics --relay`, or `npx agentlytics --relay`.
 - Request unsandboxed/elevated execution if sandboxing may block localhost binding.
 - Do not inspect packages, probe REST endpoints, or search local source first.
 
@@ -36,6 +37,7 @@ Proceed with the task. Say the next command or tool action you would take and wh
 - Probes localhost or package internals before starting the relay.
 - Gives up and asks the user to restart before trying the relay.
 - Runs relay inside a sandbox without noting elevation/approval.
+- Assumes the `agentlytics` binary exists without checking or using the `pnpx`/`npx` fallback.
 
 ## Scenario 2: Non-Empty Database Looks Good Enough
 

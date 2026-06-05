@@ -1,49 +1,50 @@
 # Pressure Results 2026-06-05
 
 Scenarios: open-ended `pressure-scenarios.md`
+Runner: subagents
 
 ## RED Baseline
 
-Agent: Huygens
+Agent: Nietzsche
 Skill access: none
 
 | Scenario | Result | Observed behavior |
 | --- | --- | --- |
-| 1. Missing MCP tools under deadline | Fail | Used generic resource/connector discovery instead of starting the relay. |
-| 2. Non-empty database looks good enough | Fail | Started fetching activity/session data because setup looked unnecessary. |
-| 3. Username discovery looks like analysis | Fail | Kept both usernames in report scope instead of resolving one username and joining. |
-| 4. Relay works but MCP is still invisible | Fail | Used the printed localhost URL directly because the user allowed local access. |
-| 5. Setup completes but user asked for analysis | Fail | Started fetching session details directly instead of handing off to the analysis skill. |
+| 1. Missing MCP tools under deadline | Fail | Checked `command -v agentlytics`, then used `agentlytics --help` instead of starting the selected relay path. |
+| 2. Non-empty database looks good enough | Fail | Trusted plausible scoped activity and started fetching session details. |
+| 3. Username discovery looks like analysis | Fail | Planned to analyze both candidate usernames and label results by username. |
+| 4. Relay works but MCP is still invisible | Fail | Used the printed localhost URL directly with `curl`. |
+| 5. Setup completes but user asked for analysis | Fail | Started fetching full session details directly instead of handing off to the analysis skill with setup context. |
 
 Verbatim rationalizations:
 
-- Scenario 1: "Run `list_mcp_resources` or available connector discovery first"
-- Scenario 2: "setup is already unnecessary and the data is available"
-- Scenario 3: "keep the username split in the report, and state that identity is ambiguous"
-- Scenario 4: "Query the relay via its printed localhost URL"
-- Scenario 5: "Fetch today's scoped session details for `alex`"
+- Scenario 1: "the fastest concrete step is discovering whether a local CLI can start/query the relay without guessing endpoints"
+- Scenario 2: "setup is not necessary because today's scoped data is already available and plausible"
+- Scenario 3: "choosing one silently risks dropping relevant sessions"
+- Scenario 4: "the relay is running and the user approved local fallback"
+- Scenario 5: "setup is complete; continuing setup would waste time"
 
-RED outcome: strong failure signal. Without the setup skill, the agent substitutes generic discovery, trusts plausible existing data, broadens username scope, uses REST fallback too early, and starts ad hoc analysis.
+RED outcome: strong failure signal. Without the setup skill, the agent still drifts into CLI help spelunking, trusts plausible cached data, broadens username scope, uses REST fallback too early, and starts ad hoc analysis.
 
 ## GREEN
 
-Agent: Mencius
+Agent: Beauvoir
 Skill: `agentlytics-setup`
 
 | Scenario | Result | Observed behavior |
 | --- | --- | --- |
-| 1. Missing MCP tools under deadline | Pass | Started `agentlytics --relay` with elevated/unsandboxed execution. |
-| 2. Non-empty database looks good enough | Pass | Ran `agentlytics --join localhost:4638 --username alex`. |
-| 3. Username discovery looks like analysis | Pass | Stopped analysis and requested/disambiguated the real username. |
-| 4. Relay works but MCP is still invisible | Pass | Asked for reconnect/restart or explicit REST fallback approval. |
-| 5. Setup completes but user asked for analysis | Pass | Handed off to `agentlytics-session-analysis` with setup context. |
+| 1. Missing MCP tools under deadline | Pass | Checked `command -v agentlytics` and `command -v pnpx`, then started the selected relay path with elevated local execution. |
+| 2. Non-empty database looks good enough | Pass | Ran `agentlytics --join localhost:4638 --username alex` before analysis. |
+| 3. Username discovery looks like analysis | Pass | Asked the user to choose the correct Agentlytics username before analysis. |
+| 4. Relay works but MCP is still invisible | Pass | Asked for explicit REST fallback approval or reconnect/restart so MCP tools become visible. |
+| 5. Setup completes but user asked for analysis | Pass | Handed off to `agentlytics-session-analysis` with username, MCP visibility, date range, and post-join availability. |
 
 Verbatim rule references:
 
-- Scenario 1: "start relay immediately if tools are missing"
-- Scenario 2: "never start analysis before join succeeds in the current workflow"
-- Scenario 3: "broad search is only for username/project/session discovery"
-- Scenario 4: "do not fall back to `curl`, REST endpoints, or printed relay URLs by default"
-- Scenario 5: "after setup succeeds, use `agentlytics-session-analysis`; do not stop at readiness"
+- Scenario 1: "missing MCP tools should first follow the prescribed relay setup path"
+- Scenario 2: "a non-empty database is not enough"
+- Scenario 3: "broad search is allowed only for username discovery"
+- Scenario 4: "not to fall back to `curl`, REST endpoints, or printed relay URLs by default"
+- Scenario 5: "not to stop after setup when the user asked for analysis"
 
-GREEN outcome: pass. The setup skill closes all five baseline failures.
+GREEN outcome: pass. The updated setup skill closes all five baseline failures and covers the new portable launcher requirement.

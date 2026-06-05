@@ -9,21 +9,9 @@ description: Use when analyzing agentic development sessions, prompt quality, ag
 
 Use this after Agentlytics setup is complete to audit sessions: prompt quality, context quality, trajectory efficiency, verification rigor, outcome, and collaboration habits.
 
-**REQUIRED SETUP:** Before analysis, use `agentlytics-setup` or confirm it already succeeded in the current workflow. The database must be freshly joined with `agentlytics --join localhost:4638 --username <username>`, and MCP tools should be visible or the user must have approved the documented fallback path.
+**REQUIRED SETUP:** Before analysis, use `agentlytics-setup` or confirm it already succeeded in the current workflow. The database must be freshly joined with the selected Agentlytics `--join localhost:4638 --username <username>` command, and MCP tools should be visible or the user must have approved the documented fallback path.
 
 If setup is missing or stale, stop analysis and run `agentlytics-setup` first.
-
-## Date Range
-
-Use the current local date from the environment. Treat date ranges as the user's timezone day boundaries unless the user asks otherwise.
-
-Range rules:
-- No range specified: analyze today.
-- Relative range specified: convert it to concrete dates in the response, e.g. "last 7 days" -> `YYYY-MM-DD..YYYY-MM-DD`.
-- Absolute range specified: use the user's dates exactly; clarify only if the range is ambiguous.
-- For a single day, include sessions whose `lastUpdated` falls on that local date.
-
-When the MCP API does not provide date filtering, fetch recent sessions and filter by `lastUpdated` locally. If the requested range is older than the recent activity window, use `search_sessions` by project/task keywords and then filter returned `lastUpdated` values.
 
 ## MCP Collection Workflow
 
@@ -78,9 +66,9 @@ If subagents are not available and no delegation threshold was met, analyze incr
 
 For the exact delegated output contract, use `subagent-prompt.md`.
 
-## Analysis Rubric
+## Analysis Dimensions
 
-Score each meaningful session from 1-10 across these dimensions:
+Give qualitative feedback for each meaningful session across these dimensions. Avoid numeric ratings; explain what was strong, weak, missing, or not assessable and what concrete behavior would improve the next run.
 
 | Dimension | What to inspect |
 | --- | --- |
@@ -116,7 +104,7 @@ Return a compact report:
 1. Data coverage: username(s), projects, date range, number of sessions found, delegated, and inspected. State clearly whether coverage is complete or sampled. If sampled, say which selection criteria were used.
 2. Top strengths: 3-5 bullets with concrete examples.
 3. Top inefficiencies: 3-5 bullets with concrete examples.
-4. Session scorecard: table with session, type, score, key issue, best next habit.
+4. Session findings: table with session, type, strongest dimension, weakest dimension, key issue, best next habit.
 5. Prompt rewrites: rewrite 2-4 weak or high-impact prompts.
 6. Persistent improvements: suggest only minimal AGENTS.md/skill rules that are justified by repeated evidence. For sampled coverage, suggest persistent rules only when the pattern repeats inside the inspected sample and label them as provisional.
 
