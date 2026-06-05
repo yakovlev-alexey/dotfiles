@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agentlytics Setup"
+  short_description: "Start and refresh local Agentlytics"
+  default_prompt: "Use $agentlytics-setup when starting the Agentlytics relay, joining or refreshing local history, discovering the username, or handling missing Agentlytics MCP visibility."
