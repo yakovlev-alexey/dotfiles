@@ -4,7 +4,7 @@
 
 - `instructions/*.md` are linked into `~/.agents/instructions`.
 - `scripts/build-agents-md` generates inline `AGENTS.md` files for `~/.agents`, Codex, Cursor, and OpenCode.
-- `skills/*` and `skills/skills.json` are assembled into `~/.agents/skills`.
+- `skills/*` and `skills.json` are assembled into `~/.agents/skills`.
 - `plugins/plugins.json` is reserved for the local Codex marketplace.
 - `mcp.json` generates live configs for Cursor, OpenCode, and Codex.
 

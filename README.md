@@ -52,6 +52,12 @@ bash ./scripts/install-windows-agent-projection
 ./scripts/check-links
 ```
 
+If the repository was cloned without submodules, initialize them before installing skills:
+
+```bash
+git submodule update --init --recursive
+```
+
 `./install` installs repository git hooks and runs `./scripts/check-links` after a normal installation. `./install --check` runs both repository static checks and live symlink checks. Git hooks rerun the link check after pull/merge or branch checkout when managed link sources have changed.
 
 ## Adding a New MCP
@@ -63,8 +69,8 @@ bash ./scripts/install-windows-agent-projection
 
 ## Adding a New Skill
 
-- local skill: place it in `ai/skills/<name>/SKILL.md`;
-- external/local source: add an entry to `ai/skills/skills.json`.
+- public local skill: place it in the `ai/skills` submodule as `<name>/SKILL.md`;
+- external/local source: add an entry to `ai/skills.json`.
 
 Then:
 

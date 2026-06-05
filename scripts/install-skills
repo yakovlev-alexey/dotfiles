@@ -5,7 +5,7 @@ set -euo pipefail
 
 repo_root=${0:A:h:h}
 skills_root="$repo_root/ai/skills"
-registry_path="$skills_root/skills.json"
+registry_path="$repo_root/ai/skills.json"
 canonical_dir="$HOME/.agents/skills"
 projection_dirs=("$HOME/.codex/skills" "$HOME/.cursor/skills")
 
@@ -59,13 +59,19 @@ project_skill() {
 mkdir -p "$canonical_dir" "${projection_dirs[@]}"
 typeset -Ua managed
 managed=()
+local_skill_count=0
 
 for skill_dir in "$skills_root"/*(N/); do
   [[ -f "$skill_dir/SKILL.md" ]] || continue
   name=${skill_dir:t}
   copy_dir "$skill_dir" "$canonical_dir/$name"
   managed+=("$name")
+  (( local_skill_count += 1 ))
 done
+
+if (( local_skill_count == 0 )); then
+  die "install-skills: no public skills found in $skills_root; run: git submodule update --init ai/skills"
+fi
 
 if [[ -f "$registry_path" ]]; then
   while IFS= read -r entry; do

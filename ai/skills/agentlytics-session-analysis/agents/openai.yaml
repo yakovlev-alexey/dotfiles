@@ -1,4 +1,0 @@
-interface:
-  display_name: "Agentlytics Session Analysis"
-  short_description: "Analyze agentic coding session history"
-  default_prompt: "Use $agentlytics-session-analysis when analyzing agentic development sessions, prompt quality, agent collaboration habits, coding-agent trajectories, or Agentlytics MCP history."

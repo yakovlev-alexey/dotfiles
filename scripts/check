@@ -11,7 +11,7 @@ while IFS= read -r script; do
   esac
 done < <(find scripts shell home githooks -type f -print; printf '%s\n' install)
 
-jq empty ai/skills/skills.json
+jq empty ai/skills.json
 jq empty ai/plugins/plugins.json
 jq empty ai/mcp.json
 jq empty opencode/opencode.template.json
