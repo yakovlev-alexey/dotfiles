@@ -1,4 +1,4 @@
 interface:
   display_name: "Agentlytics Session Analysis"
   short_description: "Analyze agentic coding session history"
-  default_prompt: "Use $agentlytics-session-analysis to inspect today's Agentlytics sessions by default, or a requested date range, then score prompt quality and agent trajectories and suggest prompt rewrites and workflow improvements."
+  default_prompt: "Use $agentlytics-session-analysis to refresh Agentlytics with agentlytics --join localhost:4638, inspect today's sessions by default or a requested date range, delegate large analyses to subagents, then score prompt quality and suggest workflow improvements."

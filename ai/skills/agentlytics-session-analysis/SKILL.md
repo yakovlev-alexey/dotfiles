@@ -17,31 +17,36 @@ The Agentlytics relay is local-only. For this workflow, broad local searches acr
 
 1. Check whether the Agentlytics MCP server is available in the current session.
    - Prefer a cheap MCP call first: `get_user_activity` for a known username/project, or `search_sessions` for a known local project name.
-   - If Agentlytics MCP tools are missing or return connection errors, do not inspect the installed package, probe REST endpoints, search local source, or spend time debugging tool registration. Start the local relay immediately with sandbox escalation, because binding the local relay port inside sandbox commonly fails with EPERM:
+   - If Agentlytics MCP tools are missing or return connection errors, do not inspect the installed package, probe REST endpoints, search local source, or spend time debugging tool registration. Start the local relay immediately:
 
 ```bash
 agentlytics --relay
 ```
 
-   - When using shell tools, request `sandbox_permissions: require_escalated` for this command. Suggested approval wording: "Allow starting the local Agentlytics relay so it can bind to localhost:4638?"
+   - If the agent runtime uses sandboxing, approval gates, or restricted local networking, request an unsandboxed/elevated local process for this command before running it. Binding the relay to `localhost:4638` can fail inside sandboxes.
+   - Portable approval wording: "Allow starting the local Agentlytics relay so it can bind to localhost:4638?"
+   - In Codex specifically, this means using `sandbox_permissions: require_escalated`.
 
-2. Check that history has been joined/synchronized.
-   - After starting the relay, if the database appears empty, if known usernames/projects return no activity, or if only stale data appears, ask for the username if it is not already known and run the join command immediately, also with sandbox escalation:
+2. Always refresh/synchronize history before analysis. This step is mandatory, even when the database is non-empty, because the local database can be stale.
+   - If the username is unknown, use `list_users` only for discovery or ask the user for the username. Do not begin analysis yet.
+   - Run the join command before collecting sessions for the report:
 
 ```bash
-agentlytics --join 192.168.1.164:4638 --username <username>
+agentlytics --join localhost:4638 --username <username>
 ```
 
-   - Suggested approval wording: "Allow Agentlytics to join the local relay and synchronize session history for <username>?"
+   - If the agent runtime uses sandboxing, approval gates, or restricted local networking, request an unsandboxed/elevated local process for this command too.
+   - Portable approval wording: "Allow Agentlytics to join the local relay and synchronize session history for <username>?"
 
-3. Verify the database is not empty before analysis.
+3. Verify the database is not empty after the mandatory join.
    - Because the relay is strictly local, `list_users` is acceptable for discovery.
    - If a known username fails, use `search_sessions` without `username` for relevant project names, folder segments, or distinctive terms.
    - Once a real username is found, prefer scoped calls with that username.
 
 Operational rules:
-- Treat `agentlytics --relay` and, when needed, `agentlytics --join 192.168.1.164:4638 --username <username>` as the prescribed setup path. Do not substitute package inspection, endpoint probing, CLI help spelunking, or alternative discovery unless these commands fail after being run with escalation.
-- Use Agentlytics MCP tools for discovery and details. Do not fall back to `curl`, local REST endpoints, or printed relay URLs by default. If MCP tools are still not visible after the relay starts, report that the current thread cannot see the MCP server and ask the user whether to reconnect/restart the thread or explicitly approve REST fallback.
+- Never start session analysis before `agentlytics --join localhost:4638 --username <username>` has run successfully in this workflow.
+- Treat `agentlytics --relay` and `agentlytics --join localhost:4638 --username <username>` as the prescribed setup path. Do not substitute package inspection, endpoint probing, CLI help spelunking, or alternative discovery unless these commands fail after being run with the runtime's required approval/elevation.
+- Use Agentlytics MCP tools for discovery and details. Do not fall back to `curl`, local REST endpoints, or printed relay URLs by default. If MCP tools are still not visible after the relay starts and join succeeds, report that the current thread cannot see the MCP server and ask the user whether to reconnect/restart the thread or explicitly approve REST fallback.
 
 ## Date Range
 
@@ -82,7 +87,15 @@ When the MCP API does not provide date filtering, fetch recent sessions and filt
 
 Use subagents when available and the analysis would otherwise flood the main context.
 
-To satisfy tool policies that require explicit delegation, the user's request should say something like: "Use `agentlytics-session-analysis` and explicitly delegate long sessions or batches to subagents." If that wording is missing and subagent tools require explicit permission, ask one short confirmation before spawning subagents.
+Delegation threshold:
+- More than 8 candidate sessions in the requested date range.
+- More than 250 total messages across candidate sessions.
+- More than 300 total tool calls across candidate sessions.
+- Any single session with more than 50 messages or more than 80 tool calls.
+
+If any threshold is met, subagent delegation is mandatory. Do not fetch a representative subset and present it as a full-range analysis.
+
+To satisfy tool policies that require explicit delegation, the user's request should say something like: "Use `agentlytics-session-analysis` and explicitly delegate long sessions or batches to subagents." If that wording is missing and subagent tools require explicit permission, stop after discovery, report the threshold that was met, and ask for explicit permission to delegate. Do not continue with partial manual analysis unless the user explicitly asks for a sampled report.
 
 Good subagent targets:
 - One long session: more than 50 messages or more than 80 tool calls.
@@ -95,7 +108,7 @@ Main agent responsibilities:
 - Ask subagents for structured summaries, not long retellings.
 - Merge subagent outputs into one final coaching report.
 
-Do not use subagents for the initial MCP discovery step. Use them after candidate sessions are selected. If subagent tools are not exposed in the current tool list, use tool discovery for sub-agent tools before falling back to local-only analysis.
+Do not use subagents for the initial MCP discovery step. Use them after candidate sessions are selected. If subagent tools are not exposed in the current tool list, use tool discovery for sub-agent tools. If the threshold is met and subagents are unavailable or permission is missing, stop and ask for permission or a narrower scope; do not analyze only part of the sessions and imply complete coverage.
 
 Subagent prompt template:
 
@@ -203,7 +216,7 @@ Use these principles when coaching the user:
 
 Return a compact report:
 
-1. Data coverage: username(s), projects, date range, number of sessions found and inspected.
+1. Data coverage: username(s), projects, date range, number of sessions found, delegated, and inspected. State clearly whether coverage is complete or sampled.
 2. Top strengths: 3-5 bullets with concrete examples.
 3. Top inefficiencies: 3-5 bullets with concrete examples.
 4. Session scorecard: table with session, type, score, key issue, best next habit.
@@ -241,4 +254,5 @@ Before editing:
 - Do not overfit to one bad session; separate one-off incidents from repeated patterns.
 - Do not recommend broad AGENTS.md rules without evidence from multiple sessions.
 - Do not load many full transcripts into the main context when subagents can summarize them.
+- Do not analyze a subset and write conclusions as if all sessions were inspected.
 - Do not expose secrets or sensitive personal data from session logs.
