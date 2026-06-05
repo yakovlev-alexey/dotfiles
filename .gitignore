@@ -14,3 +14,4 @@ logs/
 *.sqlite-wal
 Brewfile.lock.json
 personal-store/
+.codex
