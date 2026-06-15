@@ -96,7 +96,7 @@ if [[ -f "$registry_path" ]]; then
         else
           tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-skills.XXXXXX")
           trap 'rm -rf "$tmpdir"' EXIT
-          (cd "$tmpdir" && npx skills add "$source" -a codex -y)
+          (cd "$tmpdir" && npx skills add "$source" -a codex -y < /dev/null)
           for staged in "$tmpdir/.agents/skills"/*(N/); do
             names+=("${staged:t}")
             copy_dir "$staged" "$canonical_dir/${staged:t}"
@@ -123,7 +123,7 @@ if [[ -f "$registry_path" ]]; then
         trap 'rm -rf "$tmpdir"' EXIT
         command=(npx skills add "$source" -a codex -y)
         for name in "${names[@]}"; do command+=(--skill "$name"); done
-        (cd "$tmpdir" && "${command[@]}")
+        (cd "$tmpdir" && "${command[@]}" < /dev/null)
         for name in "${names[@]}"; do
           [[ -d "$tmpdir/.agents/skills/$name" ]] || die "install-skills: staged skill not found: $name"
           copy_dir "$tmpdir/.agents/skills/$name" "$canonical_dir/$name"
