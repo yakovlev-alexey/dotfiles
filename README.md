@@ -69,13 +69,37 @@ git submodule update --init --recursive
 
 ## Adding a New Skill
 
+Use dotfiles as the source of truth; do not install directly into `~/.codex/skills` as the only change.
+
 - public local skill: place it in the `ai/skills` submodule as `<name>/SKILL.md`;
-- external/local source: add an entry to `ai/skills.json`.
+- external/local source: add an entry to `ai/skills.json`;
+- official third-party skill: prefer the upstream project repo that owns the tool, then add `"<owner>/<repo>": "<skill-name>"` to `ai/skills.json`.
+
+For external skills, first verify the exact skill name and path. Good checks:
+
+```bash
+npx skills add https://github.com/<owner>/<repo> --list
+gh api repos/<owner>/<repo>/contents/skills/<skill-name>/SKILL.md --jq '.html_url'
+```
+
+Registry examples:
+
+```json
+{
+  "owner/repo": "skill-name",
+  "owner/monorepo": ["skill-a", "skill-b"],
+  "/absolute/local/skills": "local-skill"
+}
+```
 
 Then:
 
 ```bash
 ./scripts/install-skills
+test -f ~/.agents/skills/<skill-name>/SKILL.md
+test -L ~/.codex/skills/<skill-name>
+test -L ~/.cursor/skills/<skill-name>
+./scripts/check
 ```
 
 ## AGENTS.md

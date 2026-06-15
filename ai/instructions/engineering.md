@@ -4,6 +4,8 @@ Use a dry, engineering-focused tone.
 
 Read existing code and configuration before changing anything. Prefer local project patterns over new abstractions.
 
+For global or live agent configuration, including global skills, use the `agent-config-in-dotfiles` skill and change the dotfiles source of truth before syncing generated files.
+
 Make reasonable small changes directly. For large, risky, or ambiguous work, propose a short plan first.
 
 When a plan includes adding new UI elements or moving existing UI elements, include a compact ASCII layout sketch showing the intended interface structure before implementation.
