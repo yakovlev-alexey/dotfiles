@@ -23,3 +23,7 @@ esac
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
+
+# >>> practicum arc-worktree >>>
+export PATH="/Users/yakovlev-alex/arcadia/ai/tools/arc_worktree/arc_wt:$PATH"
+# <<< practicum arc-worktree <<<
