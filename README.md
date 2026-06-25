@@ -28,10 +28,10 @@ chsh -s "$(command -v zsh)"
 - Git: shared `.gitconfig` plus generated `~/.gitconfig.local` from `scripts/personal`;
 - Codex/Cursor/OpenCode skills through the shared `~/.agents/skills` layer;
 - MCP registry from `ai/mcp.json`, with generated client-specific configs;
-- `AGENTS.md` for agent directories is generated from `ai/instructions/*.md`;
+- agent instruction files are generated from `ai/instructions/*.md`: `AGENTS.md` for shared agent, Codex, and OpenCode directories, plus an always-on Cursor `.mdc` rule;
 - Homebrew inventory for macOS.
 - WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, `pnpm`, and Starship;
-- Windows agent projection from WSL into the Windows user profile for `AGENTS.md`, skills, and local plugin metadata.
+- Windows agent projection from WSL into the Windows user profile for generated instructions, skills, and local plugin metadata.
 
 ## Not Managed
 
@@ -102,9 +102,9 @@ test -L ~/.cursor/skills/<skill-name>
 ./scripts/check
 ```
 
-## AGENTS.md
+## Agent Instructions
 
-`AGENTS.md` is not stored separately for Codex. The canonical source is `ai/instructions/*.md`. The `./scripts/build-agents-md` script builds an inline `AGENTS.md` with the contents of all instruction files and places it in `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.cursor/AGENTS.md`, and `~/.config/opencode/AGENTS.md`.
+Agent instructions are not stored separately for each client. The canonical source is `ai/instructions/*.md`. The `./scripts/build-agents-md` script builds an inline `AGENTS.md` for `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md`; Cursor receives the same content as an always-on rule at `~/.cursor/rules/dotfiles-agent-instructions.mdc`.
 
 ## Windows Agents From WSL
 
@@ -117,7 +117,7 @@ C:\Users\<you>\.cursor
 C:\Users\<you>\.config\opencode
 ```
 
-The projection copies `AGENTS.md`, skills, and local plugin metadata. It deliberately does not copy generated MCP/client config files because WSL configs can contain Linux commands and paths that are not valid for Windows-native agent processes.
+The projection copies generated instructions, skills, and local plugin metadata. It deliberately does not copy generated MCP/client config files because WSL configs can contain Linux commands and paths that are not valid for Windows-native agent processes.
 
 For Codex Desktop on Windows, configure the app itself to run the agent in WSL: Settings -> Agent -> WSL, then restart the app. The integrated terminal is configured separately; choose WSL there too if you want new terminal sessions to open in Ubuntu. If multiple WSL distributions are installed, make Ubuntu the default from PowerShell:
 

@@ -29,7 +29,7 @@
 - shell:
   - [./scripts/personal check, Checking personal variables]
   - [./scripts/personal configure-git, Writing ~/.gitconfig.local]
-  - [./scripts/build-agents-md, Generating AGENTS.md files]
+  - [./scripts/build-agents-md, Generating agent instruction files]
   - [./scripts/install-skills, Syncing AI skills]
   - [./scripts/install-plugins, Syncing local Codex plugins]
   - [./scripts/install-mcp, Syncing MCP and agent configs]
