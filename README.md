@@ -29,6 +29,7 @@ chsh -s "$(command -v zsh)"
 - Codex/Cursor/OpenCode skills through the shared `~/.agents/skills` layer;
 - MCP registry from `ai/mcp.json`, with generated client-specific configs;
 - agent instruction files are generated from `ai/instructions/*.md`: `AGENTS.md` for shared agent, Codex, and OpenCode directories, plus an always-on Cursor `.mdc` rule;
+- agent hooks are generated from `ai/hooks/policies/guards/*` into Cursor, Codex, Claude Code, and OpenCode native hook surfaces;
 - Homebrew inventory for macOS.
 - WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, `pnpm`, and Starship;
 - Windows agent projection from WSL into the Windows user profile for generated instructions, skills, and local plugin metadata.
@@ -44,6 +45,7 @@ Secrets, tokens, history, sessions, sqlite files, IDE extensions, app caches, `n
 ./install --sync-only
 ./scripts/build-agents-md
 ./scripts/install-skills
+./scripts/install-agent-hooks
 ./scripts/install-mcp
 ./scripts/install-wsl-packages
 bash ./scripts/install-windows-agent-projection
@@ -110,6 +112,12 @@ test -L ~/.cursor/skills/<skill-name>
 ## Agent Instructions
 
 Agent instructions are not stored separately for each client. The canonical source is `ai/instructions/*.md`. The `./scripts/build-agents-md` script builds an inline `AGENTS.md` for `~/.agents/AGENTS.md`, `~/.codex/AGENTS.md`, and `~/.config/opencode/AGENTS.md`; Cursor receives the same content as an always-on rule at `~/.cursor/rules/dotfiles-agent-instructions.mdc`.
+
+## Agent Hooks
+
+Agent hooks are defined as vertical policy folders, for example `ai/hooks/policies/guards/<hook-id>/`. Each hook owns its manifest, handler script, and tests. Run `./scripts/install-agent-hooks` to render enabled hooks into native hook config for Cursor, Codex, Claude Code, and OpenCode.
+
+The `wide-search-guard` blocks broad `rg`/`grep`/`ugrep` searches in `$HOME` and Arcadia roots. For an explicit broad inventory requested by the user, prefix the command with `AGENT_HOOK_ALLOW_WIDE_SEARCH=1`.
 
 ## Windows Agents From WSL
 

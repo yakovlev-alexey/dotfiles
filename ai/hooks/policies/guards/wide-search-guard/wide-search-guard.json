@@ -1,0 +1,16 @@
+{
+  "id": "wide-search-guard",
+  "description": "Block broad recursive text searches in the user's home directory and Arcadia roots.",
+  "enabled": true,
+  "event": "shell.before",
+  "handler": "search_guard.py",
+  "matcher": "rg|grep|ugrep",
+  "timeout": 10,
+  "statusMessage": "Checking search scope",
+  "clients": ["cursor", "codex", "claude", "opencode"],
+  "tools": ["rg", "grep", "ugrep"],
+  "bypassEnv": "AGENT_HOOK_ALLOW_WIDE_SEARCH",
+  "homeMinDepth": 2,
+  "arcadiaMinDepth": 1,
+  "protectedRoots": ["~", "$HOME", "$HOME/arcadia", "/arcadia"]
+}

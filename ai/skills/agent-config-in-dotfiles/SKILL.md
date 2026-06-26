@@ -44,6 +44,7 @@ Use this skill for changes to:
    - dotfiles-owned skills: `ai/skills/<skill-name>/SKILL.md`, then `./scripts/install-skills`
    - public personal skills: `~/Repos/skills/<skill-name>/SKILL.md`, publish to the public skills repository, then `./scripts/install-skills`
    - external skills: `ai/skills.json`, then `./scripts/install-skills`
+   - agent hooks: `ai/hooks/policies/guards/<hook-name>/`, then `./scripts/install-agent-hooks`
    - plugins: `ai/plugins/plugins.json`, then `./scripts/install-plugins`
    - Codex config template: `codex/*.template.toml`
    - OpenCode config template: `opencode/*.template.json`

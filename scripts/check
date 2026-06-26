@@ -6,7 +6,7 @@ cd "$repo_root"
 
 while IFS= read -r script; do
   case "$script" in
-    *.zsh|scripts/personal|scripts/build-agents-md|scripts/install-skills|scripts/install-plugins|scripts/install-mcp) zsh -n "$script" ;;
+    *.zsh|scripts/personal|scripts/build-agents-md|scripts/install-skills|scripts/install-plugins|scripts/install-mcp|scripts/install-agent-hooks) zsh -n "$script" ;;
     *.sh|install|scripts/install-wsl-packages|scripts/install-windows-agent-projection|scripts/check|scripts/check-links|scripts/install-git-hooks|githooks/*) bash -n "$script" ;;
   esac
 done < <(find scripts shell home githooks -type f -print; printf '%s\n' install)
@@ -14,7 +14,17 @@ done < <(find scripts shell home githooks -type f -print; printf '%s\n' install)
 jq empty ai/skills.json
 jq empty ai/plugins/plugins.json
 jq empty ai/mcp.json
+while IFS= read -r hook_manifest; do
+  jq empty "$hook_manifest"
+done < <(find ai/hooks -name '*.json' -type f -print 2>/dev/null)
 jq empty opencode/opencode.template.json
+
+while IFS= read -r module; do
+  node --check "$module"
+done < <(find scripts/lib/agent-hooks -name '*.mjs' -type f -print 2>/dev/null)
+
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s ai/hooks/policies/guards/wide-search-guard/tests
+DOTFILES_AGENT_HOOKS_HOME="$(mktemp -d)" ./scripts/install-agent-hooks --check
 
 if rg -n --hidden --glob '!dotbot/**' --glob '!scripts/check' 'ELIZA_TOKEN=|YANDEX_MCP_PROXY_FILTER=' .; then
   echo "check: possible committed secret assignment" >&2

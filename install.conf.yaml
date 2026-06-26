@@ -12,7 +12,9 @@
   - ~/.codex
   - ~/.codex/skills
   - ~/.cursor
+  - ~/.claude
   - ~/.config/opencode
+  - ~/.config/opencode/plugins
 
 - link:
     ~/:
@@ -32,4 +34,5 @@
   - [./scripts/build-agents-md, Generating agent instruction files]
   - [./scripts/install-skills, Syncing AI skills]
   - [./scripts/install-plugins, Syncing local Codex plugins]
+  - [./scripts/install-agent-hooks, Syncing agent hooks]
   - [./scripts/install-mcp, Syncing MCP and agent configs]
