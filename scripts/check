@@ -16,7 +16,7 @@ jq empty ai/plugins/plugins.json
 jq empty ai/mcp.json
 jq empty opencode/opencode.template.json
 
-if rg -n --hidden --glob '!dotbot/**' --glob '!ai/skills/**' --glob '!scripts/check' 'ELIZA_TOKEN=|YANDEX_MCP_PROXY_FILTER=' .; then
+if rg -n --hidden --glob '!dotbot/**' --glob '!scripts/check' 'ELIZA_TOKEN=|YANDEX_MCP_PROXY_FILTER=' .; then
   echo "check: possible committed secret assignment" >&2
   exit 1
 fi

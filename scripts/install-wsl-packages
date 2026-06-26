@@ -49,7 +49,7 @@ missing_prerequisites() {
   done
 
   source_nvm
-  for cmd in node npm npx pnpm; do
+  for cmd in node pnpm pnpx; do
     command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
   done
 
@@ -160,8 +160,9 @@ fi
 if command -v corepack >/dev/null 2>&1; then
   corepack enable
   corepack prepare "pnpm@${PNPM_VERSION:-latest}" --activate
-elif command -v npm >/dev/null 2>&1; then
-  npm install --global "pnpm@${PNPM_VERSION:-latest}"
+elif ! command -v pnpm >/dev/null 2>&1; then
+  curl -fsSL https://get.pnpm.io/install.sh | ENV="$HOME/.profile" SHELL="$(command -v bash)" sh -
+  export PATH="$PNPM_HOME:$PATH"
 fi
 
 install_starship() {

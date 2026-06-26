@@ -52,7 +52,7 @@ bash ./scripts/install-windows-agent-projection
 ./scripts/check-links
 ```
 
-If the repository was cloned without submodules, initialize them before installing skills:
+If the repository was cloned without submodules, initialize them before installing:
 
 ```bash
 git submodule update --init --recursive
@@ -71,14 +71,18 @@ git submodule update --init --recursive
 
 Use dotfiles as the source of truth; do not install directly into `~/.codex/skills` as the only change.
 
-- public local skill: place it in the `ai/skills` submodule as `<name>/SKILL.md`;
+- public personal skill: place it in `~/Repos/skills/<name>/SKILL.md` and publish it to the public skills repository;
+- dotfiles-owned skill: place it in `ai/skills/<name>/SKILL.md`;
 - external/local source: add an entry to `ai/skills.json`;
 - official third-party skill: prefer the upstream project repo that owns the tool, then add `"<owner>/<repo>": "<skill-name>"` to `ai/skills.json`.
+
+`ai/skills.json` installs all public personal skills from the remote skills repository.
+Use `ai/skills` for skills that should live with this dotfiles setup.
 
 For external skills, first verify the exact skill name and path. Good checks:
 
 ```bash
-npx skills add https://github.com/<owner>/<repo> --list
+pnpx skills add https://github.com/<owner>/<repo> --list
 gh api repos/<owner>/<repo>/contents/skills/<skill-name>/SKILL.md --jq '.html_url'
 ```
 
@@ -86,6 +90,7 @@ Registry examples:
 
 ```json
 {
+  "yakovlev-alexey/skills": "*",
   "owner/repo": "skill-name",
   "owner/monorepo": ["skill-a", "skill-b"],
   "/absolute/local/skills": "local-skill"

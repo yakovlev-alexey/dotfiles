@@ -4,7 +4,7 @@ emulate -LR zsh
 set -euo pipefail
 
 repo_root=${0:A:h:h}
-skills_root="$repo_root/ai/skills"
+dotfiles_skills_root="$repo_root/ai/skills"
 registry_path="$repo_root/ai/skills.json"
 canonical_dir="$HOME/.agents/skills"
 projection_dirs=("$HOME/.codex/skills" "$HOME/.cursor/skills")
@@ -35,6 +35,41 @@ copy_dir() {
   cp -R "$src" "$dst"
 }
 
+install_owned_skills() {
+  local root=$1
+  local skill_dir name
+
+  [[ -d "$root" ]] || return
+
+  for skill_dir in "$root"/*(N/); do
+    [[ -f "$skill_dir/SKILL.md" ]] || continue
+    name=${skill_dir:t}
+    copy_dir "$skill_dir" "$canonical_dir/$name"
+    managed+=("$name")
+  done
+}
+
+link_local_skill() {
+  local src=$1 name=$2
+  [[ -d "$src" ]] || die "install-skills: missing directory: $src"
+  rm -rf "$canonical_dir/$name"
+  ln -s "$src" "$canonical_dir/$name"
+  managed+=("$name")
+}
+
+link_all_local_skills() {
+  local source=$1
+  local skill_dir count=0
+
+  for skill_dir in "$source"/*(N/); do
+    [[ -f "$skill_dir/SKILL.md" ]] || continue
+    link_local_skill "$skill_dir" "${skill_dir:t}"
+    (( count += 1 ))
+  done
+
+  (( count > 0 )) || die "install-skills: no skills found in local source: $source"
+}
+
 project_skill() {
   local src=$1 dir target current
   for dir in "${projection_dirs[@]}"; do
@@ -59,19 +94,6 @@ project_skill() {
 mkdir -p "$canonical_dir" "${projection_dirs[@]}"
 typeset -Ua managed
 managed=()
-local_skill_count=0
-
-for skill_dir in "$skills_root"/*(N/); do
-  [[ -f "$skill_dir/SKILL.md" ]] || continue
-  name=${skill_dir:t}
-  copy_dir "$skill_dir" "$canonical_dir/$name"
-  managed+=("$name")
-  (( local_skill_count += 1 ))
-done
-
-if (( local_skill_count == 0 )); then
-  die "install-skills: no public skills found in $skills_root; run: git submodule update --init ai/skills"
-fi
 
 if [[ -f "$registry_path" ]]; then
   while IFS= read -r entry; do
@@ -90,17 +112,18 @@ if [[ -f "$registry_path" ]]; then
       value=$(jq -r '.value' <<<"$entry")
       if [[ "$value" == "*" ]]; then
         if [[ -d "$source" && -f "$source/SKILL.md" ]]; then
-          names=("${source:t}")
-          rm -rf "$canonical_dir/${source:t}"
-          ln -s "$source" "$canonical_dir/${source:t}"
+          link_local_skill "$source" "${source:t}"
+        elif [[ -d "$source" ]]; then
+          link_all_local_skills "$source"
         else
           tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-skills.XXXXXX")
           trap 'rm -rf "$tmpdir"' EXIT
-          (cd "$tmpdir" && npx skills add "$source" -a codex -y < /dev/null)
+          (cd "$tmpdir" && pnpx skills add "$source" -a codex -y < /dev/null)
           for staged in "$tmpdir/.agents/skills"/*(N/); do
             names+=("${staged:t}")
             copy_dir "$staged" "$canonical_dir/${staged:t}"
           done
+          managed+=("${names[@]}")
         fi
       else
         names=("$value")
@@ -115,25 +138,25 @@ if [[ -f "$registry_path" ]]; then
       if [[ -d "$source" ]]; then
         for name in "${names[@]}"; do
           [[ -d "$source/$name" ]] || die "install-skills: missing selected local skill: $source/$name"
-          rm -rf "$canonical_dir/$name"
-          ln -s "$source/$name" "$canonical_dir/$name"
+          link_local_skill "$source/$name" "$name"
         done
       else
         tmpdir=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-skills.XXXXXX")
         trap 'rm -rf "$tmpdir"' EXIT
-        command=(npx skills add "$source" -a codex -y)
+        command=(pnpx skills add "$source" -a codex -y)
         for name in "${names[@]}"; do command+=(--skill "$name"); done
         (cd "$tmpdir" && "${command[@]}" < /dev/null)
         for name in "${names[@]}"; do
           [[ -d "$tmpdir/.agents/skills/$name" ]] || die "install-skills: staged skill not found: $name"
           copy_dir "$tmpdir/.agents/skills/$name" "$canonical_dir/$name"
         done
+        managed+=("${names[@]}")
       fi
     fi
-
-    managed+=("${names[@]}")
   done < <(jq -c 'to_entries[]' "$registry_path")
 fi
+
+install_owned_skills "$dotfiles_skills_root"
 
 typeset -A keep
 for name in "${managed[@]}"; do keep[$name]=1; done
