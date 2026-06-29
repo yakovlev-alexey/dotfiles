@@ -4,6 +4,7 @@ import { hookCommand, jsonFileUpdate, readJsonFile, replaceManagedCommandHook } 
 export function render(specs, context) {
   const targetPath = path.join(context.home, '.cursor/hooks.json');
   const config = readJsonFile(targetPath, { hooks: {} }, context);
+  if (typeof config.version !== 'number') config.version = 1;
   config.hooks ??= {};
 
   for (const spec of specs) {

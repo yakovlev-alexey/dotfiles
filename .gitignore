@@ -3,6 +3,8 @@
 *.swo
 *.bak
 *.tmp
+__pycache__/
+*.pyc
 node_modules/
 .cache/
 .tmp/

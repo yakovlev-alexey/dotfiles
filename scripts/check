@@ -25,6 +25,9 @@ done < <(find scripts/lib/agent-hooks -name '*.mjs' -type f -print 2>/dev/null)
 
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s ai/hooks/policies/guards/wide-search-guard/tests
 DOTFILES_AGENT_HOOKS_HOME="$(mktemp -d)" ./scripts/install-agent-hooks --check
+hooks_check_home="$(mktemp -d)"
+node scripts/lib/agent-hooks/render-agent-hooks.mjs "$repo_root" install "$hooks_check_home" >/dev/null
+jq -e '.version | type == "number"' "$hooks_check_home/.cursor/hooks.json" >/dev/null
 
 if rg -n --hidden --glob '!dotbot/**' --glob '!scripts/check' 'ELIZA_TOKEN=|YANDEX_MCP_PROXY_FILTER=' .; then
   echo "check: possible committed secret assignment" >&2
