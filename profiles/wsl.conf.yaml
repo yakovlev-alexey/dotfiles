@@ -1,3 +1,17 @@
+- defaults:
+    link:
+      relink: true
+      force: true
+      create: true
+
+- create:
+  - ~/.config/Cursor/User
+  - ~/.config/Code/User
+
+- link:
+    ~/.config/Cursor/User/settings.json: config/editor/settings.json
+    ~/.config/Code/User/settings.json: config/editor/settings.json
+
 - shell:
   - [./scripts/install-wsl-packages --check, Checking WSL package prerequisites]
   - [bash ./scripts/install-windows-agent-projection --check, Checking Windows agent projection]

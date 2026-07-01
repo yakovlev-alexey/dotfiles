@@ -44,6 +44,17 @@ while IFS= read -r instruction; do
   check_link "$HOME/.agents/instructions/$name" "ai/instructions/$name"
 done < <(find "$repo_root/ai/instructions" -maxdepth 1 -type f -name '*.md' | sort)
 
+case "$(uname -s)" in
+  Darwin)
+    check_link "$HOME/Library/Application Support/Cursor/User/settings.json" "config/editor/settings.json"
+    check_link "$HOME/Library/Application Support/Code/User/settings.json" "config/editor/settings.json"
+    ;;
+  Linux)
+    check_link "$HOME/.config/Cursor/User/settings.json" "config/editor/settings.json"
+    check_link "$HOME/.config/Code/User/settings.json" "config/editor/settings.json"
+    ;;
+esac
+
 if ((failed)); then
   exit 1
 fi

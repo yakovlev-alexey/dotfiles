@@ -1,2 +1,16 @@
+- defaults:
+    link:
+      relink: true
+      force: true
+      create: true
+
+- create:
+  - ~/Library/Application Support/Cursor/User
+  - ~/Library/Application Support/Code/User
+
+- link:
+    ~/Library/Application Support/Cursor/User/settings.json: config/editor/settings.json
+    ~/Library/Application Support/Code/User/settings.json: config/editor/settings.json
+
 - shell:
   - [brew bundle --file=Brewfile, Installing Homebrew packages]
