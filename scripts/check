@@ -7,7 +7,7 @@ cd "$repo_root"
 while IFS= read -r script; do
   case "$script" in
     *.zsh|scripts/personal|scripts/build-agents-md|scripts/install-skills|scripts/install-plugins|scripts/install-mcp|scripts/install-agent-hooks) zsh -n "$script" ;;
-    *.sh|install|scripts/install-wsl-packages|scripts/install-windows-agent-projection|scripts/check|scripts/check-links|scripts/install-git-hooks|githooks/*) bash -n "$script" ;;
+    *.sh|install|scripts/install-wsl-packages|scripts/install-windows-agent-projection|scripts/install-editor-extensions|scripts/check|scripts/check-links|scripts/install-git-hooks|githooks/*) bash -n "$script" ;;
   esac
 done < <(find scripts shell home githooks -type f -print; printf '%s\n' install)
 
@@ -28,6 +28,8 @@ DOTFILES_AGENT_HOOKS_HOME="$(mktemp -d)" ./scripts/install-agent-hooks --check
 hooks_check_home="$(mktemp -d)"
 node scripts/lib/agent-hooks/render-agent-hooks.mjs "$repo_root" install "$hooks_check_home" >/dev/null
 jq -e '.version | type == "number"' "$hooks_check_home/.cursor/hooks.json" >/dev/null
+
+./scripts/install-editor-extensions --check
 
 if rg -n --hidden --glob '!dotbot/**' --glob '!scripts/check' 'ELIZA_TOKEN=|YANDEX_MCP_PROXY_FILTER=' .; then
   echo "check: possible committed secret assignment" >&2

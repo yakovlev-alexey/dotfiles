@@ -27,6 +27,7 @@ chsh -s "$(command -v zsh)"
 - prompt: Starship with managed `~/.config/starship.toml`;
 - Git: shared `.gitconfig` plus generated `~/.gitconfig.local` from `scripts/personal`;
 - Codex/Cursor/OpenCode skills through the shared `~/.agents/skills` layer;
+- shared VS Code/Cursor `settings.json` and extension list from `config/editor/`;
 - MCP registry from `ai/mcp.json`, with generated client-specific configs;
 - agent instruction files are generated from `ai/instructions/*.md`: `AGENTS.md` for shared agent, Codex, and OpenCode directories, plus an always-on Cursor `.mdc` rule;
 - agent hooks are generated from `ai/hooks/policies/guards/*` into Cursor, Codex, Claude Code, and OpenCode native hook surfaces;
@@ -36,7 +37,7 @@ chsh -s "$(command -v zsh)"
 
 ## Not Managed
 
-Secrets, tokens, history, sessions, sqlite files, IDE extensions, app caches, `node_modules`, `~/.ssh` private keys, `.arc`/`.ya` runtime state, Codex worktrees, and runtime/cache directories are not committed or linked.
+Secrets, tokens, history, sessions, sqlite files, app caches, `node_modules`, `~/.ssh` private keys, `.arc`/`.ya` runtime state, Codex worktrees, and runtime/cache directories are not committed or linked.
 
 ## Common Commands
 
@@ -47,6 +48,7 @@ Secrets, tokens, history, sessions, sqlite files, IDE extensions, app caches, `n
 ./scripts/install-skills
 ./scripts/install-agent-hooks
 ./scripts/install-mcp
+./scripts/install-editor-extensions
 ./scripts/install-wsl-packages
 bash ./scripts/install-windows-agent-projection
 ./scripts/install-git-hooks

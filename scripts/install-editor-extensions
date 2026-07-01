@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+extensions_file="$repo_root/config/editor/extensions.txt"
+mode=install
+
+case "${1:-}" in
+  "" ) ;;
+  --check|--dry-run) mode="${1#--}" ;;
+  *)
+    echo "install-editor-extensions: unknown argument: $1" >&2
+    exit 2
+    ;;
+esac
+
+if [[ ! -f "$extensions_file" ]]; then
+  echo "install-editor-extensions: missing extensions file: $extensions_file" >&2
+  exit 1
+fi
+
+resolve_editor_cli() {
+  local editor=$1
+
+  case "$(uname -s)" in
+    Darwin)
+      case "$editor" in
+        cursor)
+          if [[ -x "/Applications/Cursor.app/Contents/Resources/app/bin/cursor" ]]; then
+            echo "/Applications/Cursor.app/Contents/Resources/app/bin/cursor"
+            return 0
+          fi
+          ;;
+        code)
+          if [[ -x "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]]; then
+            echo "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+            return 0
+          fi
+          ;;
+      esac
+      ;;
+  esac
+
+  if command -v "$editor" >/dev/null 2>&1; then
+    local cli_path
+    cli_path="$(command -v "$editor")"
+    if [[ -x "$cli_path" ]]; then
+      echo "$cli_path"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+cursor_only_extension() {
+  local scope=$1
+  [[ "$scope" == cursor ]]
+}
+
+read_extensions() {
+  local line extension_id scope
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    scope=all
+    if [[ "$line" == *"# cursor" ]]; then
+      scope=cursor
+      line="${line%%# cursor*}"
+    fi
+    line="${line%%#*}"
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    [[ -z "$line" ]] && continue
+    extension_id="${line%%@*}"
+    printf '%s\t%s\t%s\n' "$extension_id" "$line" "$scope"
+  done < "$extensions_file"
+}
+
+list_installed_extensions() {
+  local cli=$1
+  "$cli" --list-extensions 2>/dev/null | sort -u
+}
+
+extension_installed() {
+  local extension_id=$1
+  local installed_list=$2
+  printf '%s\n' "$installed_list" | grep -qx "$extension_id"
+}
+
+install_extension() {
+  local cli=$1
+  local spec=$2
+
+  if "$cli" --install-extension "$spec" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "install-editor-extensions: failed to install $spec via $(basename "$cli")" >&2
+  return 1
+}
+
+sync_editor() {
+  local editor=$1
+  local cli=$2
+  local skip_cursor_only=$3
+  local failed=0
+  local installed_list
+  local extension_id spec scope
+
+  installed_list="$(list_installed_extensions "$cli")"
+
+  while IFS=$'\t' read -r extension_id spec scope; do
+    if [[ "$skip_cursor_only" == true ]] && cursor_only_extension "$scope"; then
+      continue
+    fi
+
+    case "$mode" in
+      dry-run)
+        echo "install-editor-extensions: would install $spec via $editor"
+        ;;
+      check)
+        if ! extension_installed "$extension_id" "$installed_list"; then
+          echo "install-editor-extensions: missing $extension_id in $editor" >&2
+          failed=1
+        fi
+        ;;
+      install)
+        if extension_installed "$extension_id" "$installed_list"; then
+          continue
+        fi
+        install_extension "$cli" "$spec" || failed=1
+        ;;
+    esac
+  done < <(read_extensions)
+
+  return "$failed"
+}
+
+failed=0
+editors_synced=0
+
+while IFS= read -r editor; do
+  cli=""
+  if ! cli="$(resolve_editor_cli "$editor")"; then
+    echo "install-editor-extensions: skipping $editor (CLI not found)" >&2
+    continue
+  fi
+
+  skip_cursor_only=false
+  if [[ "$editor" == code ]]; then
+    skip_cursor_only=true
+  fi
+
+  if ! sync_editor "$editor" "$cli" "$skip_cursor_only"; then
+    failed=1
+  fi
+  editors_synced=$((editors_synced + 1))
+done <<'EOF'
+cursor
+code
+EOF
+
+if ((editors_synced == 0)); then
+  echo "install-editor-extensions: no editor CLI found" >&2
+  exit 1
+fi
+
+if ((failed)); then
+  exit 1
+fi
+
+case "$mode" in
+  check) echo "install-editor-extensions: check ok" ;;
+  dry-run) echo "install-editor-extensions: dry-run ok" ;;
+  *) echo "install-editor-extensions: synced editor extensions" ;;
+esac

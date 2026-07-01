@@ -36,3 +36,4 @@
   - [./scripts/install-plugins, Syncing local Codex plugins]
   - [./scripts/install-agent-hooks, Syncing agent hooks]
   - [./scripts/install-mcp, Syncing MCP and agent configs]
+  - [./scripts/install-editor-extensions, Syncing editor extensions]

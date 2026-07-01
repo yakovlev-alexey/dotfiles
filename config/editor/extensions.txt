@@ -1,0 +1,53 @@
+# Canonical editor extensions for VS Code and Cursor.
+# One extension per line: publisher.name@version
+# Lines ending with "# cursor" are installed only in Cursor.
+alexanderbast.vscode-snazzy@2.9.0
+alexkrechik.cucumberautocomplete@3.0.5
+andersnm.sourcemap-helper@1.0.0
+antfu.slidev@52.16.0
+anysphere.cursorpyright@1.0.12 # cursor
+anysphere.remote-containers@1.0.37 # cursor
+anysphere.remote-ssh@1.1.4 # cursor
+arthurlobo.easy-codesnap@1.37.4
+astro-build.astro-vscode@2.16.13
+blodwynn.featurehighlight@1.8.0
+christian-kohler.path-intellisense@2.10.0
+csstools.postcss@1.0.9
+davidanson.vscode-markdownlint@0.61.2
+dbaeumer.vscode-eslint@3.0.24
+donjayamanne.githistory@0.6.20
+dotjoshjohnson.xml@2.5.1
+ecmel.vscode-html-css@2.0.14
+editorconfig.editorconfig@0.18.2
+esbenp.prettier-vscode@12.4.0
+figma.figma-vscode-extension@0.4.1
+github.vscode-github-actions@0.32.1
+golang.go@0.54.0
+jdinhlife.gruvbox@1.29.1
+jebbs.plantuml@2.18.1
+kylinideteam.gitlens@0.1.10 # cursor
+mechatroner.rainbow-csv@3.24.1
+mhutchie.git-graph@1.30.0
+ms-azuretools.vscode-containers@2.4.5
+ms-azuretools.vscode-docker@2.0.0
+ms-python.autopep8@2026.4.0
+ms-python.black-formatter@2025.2.0
+ms-python.debugpy@2026.6.0
+ms-python.isort@2025.0.0
+ms-python.python@2025.6.1
+ms-python.vscode-pylance@2024.8.1
+ms-vsliveshare.vsliveshare@1.0.5948
+naumovs.color-highlight@2.8.0
+perseus.vscode-yandex-arc@0.566.0 # cursor
+pflannery.vscode-versionlens@1.28.0
+prisma.prisma@31.11.0
+redhat.vscode-yaml@1.23.0
+stylelint.vscode-stylelint@2.2.1
+teticio.python-envy@0.1.10
+tomoki1207.pdf@1.2.2
+usernamehw.errorlens@3.26.0
+viknet.intelliboba@0.11.8
+vlkoti.vscode-sourcemaps-navigator@0.0.3
+vscode-icons-team.vscode-icons@12.19.0
+wholroyd.jinja@0.0.8
+yakovlev-alexey.frontmatter-preview-table@0.1.0
