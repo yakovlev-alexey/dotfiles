@@ -79,6 +79,10 @@ project_skill() {
       current=$(readlink "$target")
       [[ "$current" == "$src" || "${current:A}" == "${src:A}" ]] && continue
       [[ "$current" == "$canonical_dir/"* ]] && rm -f "$target"
+      if [[ -L "$target" ]]; then
+        print "install-skills: keeping unmanaged entry: $target"
+        continue
+      fi
     elif [[ -e "$target" ]]; then
       if [[ -d "$target" && -d "$src" ]] && diff -qr "$target" "$src" >/dev/null 2>&1; then
         rm -rf "$target"
