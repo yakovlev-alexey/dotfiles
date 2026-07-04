@@ -31,8 +31,8 @@ chsh -s "$(command -v zsh)"
 - MCP registry from `ai/mcp.json`, with generated client-specific configs;
 - agent instruction files are generated from `ai/instructions/*.md`: `AGENTS.md` for shared agent, Codex, and OpenCode directories, plus an always-on Cursor `.mdc` rule;
 - agent hooks are generated from `ai/hooks/policies/guards/*` into Cursor, Codex, Claude Code, and OpenCode native hook surfaces;
-- Homebrew inventory for macOS.
-- WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, `pnpm`, and Starship;
+- Homebrew inventory for macOS, including `uv`, `podman`, and desktop apps (Brave, Miro, OBS, Ollama, Podman Desktop, Telegram, Zoom);
+- WSL package bootstrap with Ubuntu/Debian analogs for the Homebrew inventory, plus `nvm`, LTS Node.js, `pnpm`, `uv`, and Starship;
 - Windows agent projection from WSL into the Windows user profile for generated instructions, skills, and local plugin metadata.
 
 ## Not Managed
@@ -47,6 +47,8 @@ Secrets, tokens, history, sessions, sqlite files, app caches, `node_modules`, `~
 ./scripts/build-agents-md
 ./scripts/install-skills
 ./scripts/install-agent-hooks
+./scripts/install-uv
+./scripts/install-telegram-mcp
 ./scripts/install-mcp
 ./scripts/install-editor-extensions
 ./scripts/install-wsl-packages
