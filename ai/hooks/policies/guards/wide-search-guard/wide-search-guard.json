@@ -8,6 +8,8 @@
   "timeout": 10,
   "statusMessage": "Checking search scope",
   "clients": ["cursor", "codex", "claude", "opencode"],
+  "cursorNativeTools": ["Grep", "Glob", "SemanticSearch"],
+  "cursorPreToolUseMatcher": "Grep|Glob|SemanticSearch",
   "tools": ["rg", "grep", "ugrep"],
   "bypassEnv": "AGENT_HOOK_ALLOW_WIDE_SEARCH",
   "homeMinDepth": 2,

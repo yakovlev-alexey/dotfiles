@@ -18,7 +18,7 @@ for parent in Path(__file__).resolve().parents:
         sys.path.insert(0, str(parent))
         break
 
-from lib.hook_runtime import Decision, decide_shell_payload, load_json_config, run_cli
+from lib.hook_runtime import Decision, decide_shell_payload, extract_cwd, load_json_config, run_cli
 
 
 HOOK_ID = "wide-search-guard"
@@ -237,6 +237,79 @@ def classify_broad_path(path_value: str, cwd: str, config: dict[str, Any]) -> st
     return None
 
 
+def extract_tool_name(payload: dict[str, Any]) -> str | None:
+    name = payload.get("tool_name") or payload.get("toolName")
+    return name if isinstance(name, str) and name else None
+
+
+def extract_tool_input(payload: dict[str, Any]) -> dict[str, Any]:
+    tool_input = payload.get("tool_input") or payload.get("toolInput")
+    return tool_input if isinstance(tool_input, dict) else {}
+
+
+def deny_broad_search(tool_name: str, broad_root: str, config: dict[str, Any]) -> Decision:
+    reason = (
+        f"Blocked broad {tool_name} search under {broad_root}. "
+        "Narrow the path to a repo/service subdirectory, or set "
+        f"{config['bypassEnv']}=1 only for an explicit broad inventory."
+    )
+    return Decision("deny", reason)
+
+
+def decide_native_targets(
+    tool_name: str,
+    targets: list[str],
+    *,
+    pathless: bool,
+    cwd: str,
+    config: dict[str, Any],
+) -> Decision:
+    resolved_targets = ["."] if pathless and not targets else targets
+    for target in resolved_targets:
+        broad_root = classify_broad_path(target, cwd, config)
+        if broad_root:
+            return deny_broad_search(tool_name, broad_root, config)
+    return Decision("allow")
+
+
+def decide_native_tool(payload: dict[str, Any], cwd: str, config: dict[str, Any]) -> Decision | None:
+    tool_name = extract_tool_name(payload)
+    if not tool_name:
+        return None
+
+    native_tools = set(config.get("cursorNativeTools", []))
+    if tool_name not in native_tools:
+        return None
+
+    tool_input = extract_tool_input(payload)
+
+    if tool_name == "Grep":
+        path = tool_input.get("path")
+        if path:
+            return decide_native_targets("Grep", [str(path)], pathless=False, cwd=cwd, config=config)
+        return decide_native_targets("Grep", [], pathless=True, cwd=cwd, config=config)
+
+    if tool_name == "Glob":
+        target = tool_input.get("target_directory")
+        if target:
+            return decide_native_targets("Glob", [str(target)], pathless=False, cwd=cwd, config=config)
+        return decide_native_targets("Glob", [], pathless=True, cwd=cwd, config=config)
+
+    if tool_name == "SemanticSearch":
+        directories = tool_input.get("target_directories")
+        if isinstance(directories, list) and directories:
+            return decide_native_targets(
+                "SemanticSearch",
+                [str(directory) for directory in directories if directory],
+                pathless=False,
+                cwd=cwd,
+                config=config,
+            )
+        return decide_native_targets("SemanticSearch", [], pathless=True, cwd=cwd, config=config)
+
+    return None
+
+
 def analyze_tokens(tokens: list[str], cwd: str, config: dict[str, Any]) -> Decision:
     current_cwd = posixpath.normpath(cwd)
     bypass_env = config["bypassEnv"]
@@ -274,12 +347,7 @@ def analyze_tokens(tokens: list[str], cwd: str, config: dict[str, Any]) -> Decis
         for target in targets:
             broad_root = classify_broad_path(target, current_cwd, config)
             if broad_root:
-                reason = (
-                    f"Blocked broad {parsed.tool} search under {broad_root}. "
-                    "Narrow the path to a repo/service subdirectory, or set "
-                    f"{config['bypassEnv']}=1 only for an explicit broad inventory."
-                )
-                return Decision("deny", reason)
+                return deny_broad_search(parsed.tool, broad_root, config)
 
     return Decision("allow")
 
@@ -293,7 +361,16 @@ def decide_command(command: str, cwd: str, config: dict[str, Any]) -> Decision:
 
 
 def decide_payload(payload: dict[str, Any], config: dict[str, Any] | None = None) -> Decision:
-    return decide_shell_payload(payload, config or load_config(), decide_command)
+    active_config = config or load_config()
+    if os.environ.get(active_config["bypassEnv"]) == "1":
+        return Decision("allow")
+
+    cwd = extract_cwd(payload)
+    native_decision = decide_native_tool(payload, cwd, active_config)
+    if native_decision is not None:
+        return native_decision
+
+    return decide_shell_payload(payload, active_config, decide_command)
 
 
 def main() -> int:

@@ -106,6 +106,19 @@ def emit_native(client: str, decision: Decision, hook_event_name: str = "PreTool
         return 0
 
     if client == "cursor":
+        if hook_event_name.lower() == "pretooluse":
+            print(
+                json.dumps(
+                    {
+                        "permission": "deny",
+                        "agent_message": decision.reason,
+                        "user_message": decision.reason,
+                    },
+                    separators=(",", ":"),
+                )
+            )
+            return 0
+
         print(decision.reason, file=sys.stderr)
         return 2
 
@@ -156,4 +169,5 @@ def run_cli(
         print(json.dumps({"decision": decision.decision, "reason": decision.reason}, separators=(",", ":")))
         return 0
 
-    return emit_native(args.client, decision, hook_event_name)
+    event_name = payload.get("hook_event_name") or hook_event_name
+    return emit_native(args.client, decision, event_name)

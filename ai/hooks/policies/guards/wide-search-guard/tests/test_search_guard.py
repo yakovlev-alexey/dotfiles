@@ -23,6 +23,7 @@ class WideSearchGuardTests(unittest.TestCase):
             "bypassEnv": "AGENT_HOOK_ALLOW_WIDE_SEARCH",
             "homeMinDepth": 2,
             "arcadiaMinDepth": 1,
+            "cursorNativeTools": ["Grep", "Glob", "SemanticSearch"],
         }
 
     def decide(self, command, cwd="/Users/tester/Repos/project"):
@@ -85,6 +86,51 @@ class WideSearchGuardTests(unittest.TestCase):
                     self.config,
                 )
         self.assertEqual("deny", decision.decision)
+
+    def test_blocks_cursor_grep_in_home(self):
+        payload = {
+            "tool_name": "Grep",
+            "tool_input": {"pattern": "TODO", "path": "/Users/tester"},
+            "cwd": "/Users/tester/Repos/project",
+            "hook_event_name": "preToolUse",
+        }
+        with patch.dict(os.environ, {"HOME": self.home}, clear=False):
+            with patch("os.path.expanduser", lambda value: self.home if value == "~" else value):
+                decision = search_guard.decide_payload(payload, self.config)
+        self.assertEqual("deny", decision.decision)
+
+    def test_blocks_cursor_glob_in_arcadia(self):
+        payload = {
+            "tool_name": "Glob",
+            "tool_input": {"glob_pattern": "**/*.ts", "target_directory": "/Users/tester/arcadia"},
+            "cwd": "/Users/tester/Repos/project",
+        }
+        with patch.dict(os.environ, {"HOME": self.home}, clear=False):
+            with patch("os.path.expanduser", lambda value: self.home if value == "~" else value):
+                decision = search_guard.decide_payload(payload, self.config)
+        self.assertEqual("deny", decision.decision)
+
+    def test_blocks_cursor_semantic_search_from_home(self):
+        payload = {
+            "tool_name": "SemanticSearch",
+            "tool_input": {"query": "auth flow"},
+            "cwd": "/Users/tester",
+        }
+        with patch.dict(os.environ, {"HOME": self.home}, clear=False):
+            with patch("os.path.expanduser", lambda value: self.home if value == "~" else value):
+                decision = search_guard.decide_payload(payload, self.config)
+        self.assertEqual("deny", decision.decision)
+
+    def test_allows_cursor_grep_in_repo(self):
+        payload = {
+            "tool_name": "Grep",
+            "tool_input": {"pattern": "TODO", "path": "/Users/tester/Repos/project"},
+            "cwd": "/Users/tester/Repos/project",
+        }
+        with patch.dict(os.environ, {"HOME": self.home}, clear=False):
+            with patch("os.path.expanduser", lambda value: self.home if value == "~" else value):
+                decision = search_guard.decide_payload(payload, self.config)
+        self.assertEqual("allow", decision.decision)
 
 
 if __name__ == "__main__":

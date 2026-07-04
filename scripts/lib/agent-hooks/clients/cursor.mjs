@@ -17,6 +17,18 @@ export function render(specs, context) {
         matcher: spec.matcher,
       },
     );
+
+    if (spec.cursorPreToolUseMatcher) {
+      config.hooks.preToolUse = replaceManagedCommandHook(
+        config.hooks.preToolUse,
+        spec,
+        {
+          command: hookCommand(spec, 'cursor'),
+          timeout: spec.timeout,
+          matcher: spec.cursorPreToolUseMatcher,
+        },
+      );
+    }
   }
 
   return [jsonFileUpdate(targetPath, config)];

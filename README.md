@@ -121,7 +121,7 @@ Agent instructions are not stored separately for each client. The canonical sour
 
 Agent hooks are defined as vertical policy folders, for example `ai/hooks/policies/guards/<hook-id>/`. Each hook owns its manifest, handler script, and tests. Run `./scripts/install-agent-hooks` to render enabled hooks into native hook config for Cursor, Codex, Claude Code, and OpenCode.
 
-The `wide-search-guard` blocks broad `rg`/`grep`/`ugrep` searches in `$HOME` and Arcadia roots. For an explicit broad inventory requested by the user, prefix the command with `AGENT_HOOK_ALLOW_WIDE_SEARCH=1`.
+The `wide-search-guard` blocks broad `rg`/`grep`/`ugrep` searches in `$HOME` and Arcadia roots. In Cursor it also intercepts native `Grep`, `Glob`, and `SemanticSearch` tool calls via `preToolUse`. For an explicit broad inventory requested by the user, prefix the command with `AGENT_HOOK_ALLOW_WIDE_SEARCH=1`.
 
 ## Windows Agents From WSL
 
