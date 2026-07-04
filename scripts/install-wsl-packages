@@ -44,7 +44,7 @@ has_nvm() {
 missing_prerequisites() {
   local missing=() cmd
 
-  for cmd in git zsh jq curl rg starship; do
+  for cmd in git zsh jq curl rg starship uv; do
     command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
   done
 
@@ -174,7 +174,20 @@ install_starship() {
   curl -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin"
 }
 
+install_uv() {
+  if command -v uv >/dev/null 2>&1; then
+    return
+  fi
+
+  curl -fsSL https://astral.sh/uv/install.sh | sh
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+  esac
+}
+
 install_starship
+install_uv
 
 if command -v pipx >/dev/null 2>&1; then
   pipx ensurepath || true

@@ -86,5 +86,26 @@
         "enabled": false
       }
     }
+  },
+  "telegram": {
+    "enabled": true,
+    "transport": "local",
+    "command": "~/Repos/dotfiles/scripts/mcp/run-telegram-mcp",
+    "args": [],
+    "clients": {
+      "cursor": {
+        "name": "telegram"
+      },
+      "opencode": {
+        "name": "telegram"
+      },
+      "codex": {
+        "name": "telegram",
+        "startup_timeout_sec": 45
+      },
+      "claude": {
+        "name": "telegram"
+      }
+    }
   }
 }

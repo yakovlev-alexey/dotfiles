@@ -1,0 +1,48 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h}
+ref_file="$repo_root/ai/telegram-mcp.ref"
+spec_file="$repo_root/ai/telegram-mcp.spec"
+
+die() {
+  print -u2 -- "$1"
+  exit 1
+}
+
+[[ -r "$ref_file" ]] || die "install-telegram-mcp: missing $ref_file"
+
+ref=$(head -n1 "$ref_file" | tr -d '[:space:]')
+[[ -n "$ref" ]] || die "install-telegram-mcp: empty ref in $ref_file"
+
+git_spec="git+https://github.com/chigwell/telegram-mcp.git@${ref}"
+
+ensure_local_bin_path() {
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+  esac
+}
+
+if [[ "${1:-}" == "--print-spec" ]]; then
+  print -r -- "$git_spec"
+  exit 0
+fi
+
+"$repo_root/scripts/install-uv"
+ensure_local_bin_path
+
+print -r -- "install-telegram-mcp: installing chigwell/telegram-mcp@${ref}"
+uv tool install --reinstall "$git_spec"
+
+telegram_mcp=$(command -v telegram-mcp) || die "install-telegram-mcp: telegram-mcp not found in PATH after install"
+
+{
+  print -r -- "ref=$ref"
+  print -r -- "git_spec=$git_spec"
+  print -r -- "bin=$telegram_mcp"
+} > "$spec_file"
+
+print -r -- "install-telegram-mcp: ok ($telegram_mcp)"

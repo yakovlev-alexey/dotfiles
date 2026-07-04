@@ -35,5 +35,7 @@
   - [./scripts/install-skills, Syncing AI skills]
   - [./scripts/install-plugins, Syncing local Codex plugins]
   - [./scripts/install-agent-hooks, Syncing agent hooks]
+  - [./scripts/install-uv, Ensuring uv is installed]
+  - [./scripts/install-telegram-mcp, Installing pinned telegram-mcp]
   - [./scripts/install-mcp, Syncing MCP and agent configs]
   - [./scripts/install-editor-extensions, Syncing editor extensions]

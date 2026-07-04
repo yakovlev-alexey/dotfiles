@@ -1,0 +1,74 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+mode=${1:-install}
+
+die() {
+  print -u2 -- "$1"
+  exit 1
+}
+
+ensure_local_bin_path() {
+  case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+  esac
+}
+
+uv_path() {
+  ensure_local_bin_path
+  command -v uv 2>/dev/null || return 1
+}
+
+usage() {
+  cat <<'USAGE'
+Usage: ./scripts/install-uv [--check]
+
+Ensures uv is installed and available on PATH.
+USAGE
+}
+
+case "$mode" in
+  --check)
+    if uv_path >/dev/null; then
+      print -r -- "install-uv: ok ($(uv_path))"
+      exit 0
+    fi
+    die "install-uv: missing. Run ./scripts/install-uv"
+    ;;
+  install|--help|-h)
+    [[ "$mode" == "--help" || "$mode" == "-h" ]] && usage && exit 0
+    ;;
+  *)
+    die "install-uv: unknown argument: $mode"
+    ;;
+esac
+
+if uv_path >/dev/null; then
+  print -r -- "install-uv: ok ($(uv_path))"
+  exit 0
+fi
+
+case "$(uname -s)" in
+  Darwin)
+    if command -v brew >/dev/null 2>&1; then
+      print -r -- "install-uv: installing via Homebrew"
+      brew install uv
+    else
+      die "install-uv: Homebrew not found. Install uv manually: https://docs.astral.sh/uv/"
+    fi
+    ;;
+  Linux)
+    print -r -- "install-uv: installing via astral.sh installer"
+    curl -fsSL https://astral.sh/uv/install.sh | sh
+    ensure_local_bin_path
+    ;;
+  *)
+    die "install-uv: unsupported OS: $(uname -s)"
+    ;;
+esac
+
+uv_path >/dev/null || die "install-uv: uv still missing after install"
+print -r -- "install-uv: ok ($(uv_path))"

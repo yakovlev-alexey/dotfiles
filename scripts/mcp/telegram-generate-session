@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h:h}
+
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+if command -v telegram-mcp-generate-session >/dev/null 2>&1; then
+  exec telegram-mcp-generate-session "$@"
+fi
+
+"$repo_root/scripts/install-uv"
+git_spec="$("$repo_root/scripts/install-telegram-mcp" --print-spec)"
+exec uvx --from "$git_spec" telegram-mcp-generate-session "$@"

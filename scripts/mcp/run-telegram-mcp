@@ -1,0 +1,30 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+set -euo pipefail
+
+repo_root=${0:A:h:h:h}
+source "$repo_root/scripts/personal"
+personal_load_env
+
+for var in TELEGRAM_API_ID TELEGRAM_API_HASH TELEGRAM_SESSION_STRING; do
+  if [[ -z "${(P)var:-}" ]]; then
+    print -u2 -- "run-telegram-mcp: $var is missing. Run: $repo_root/scripts/personal setup"
+    exit 1
+  fi
+done
+
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+if ! command -v telegram-mcp >/dev/null 2>&1; then
+  print -u2 -- "run-telegram-mcp: telegram-mcp not installed. Run: $repo_root/scripts/install-telegram-mcp"
+  exit 1
+fi
+
+export TELEGRAM_API_ID TELEGRAM_API_HASH TELEGRAM_SESSION_STRING
+export TELEGRAM_EXPOSED_TOOLS=read-only
+
+exec telegram-mcp "$@"

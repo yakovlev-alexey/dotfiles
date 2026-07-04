@@ -35,6 +35,13 @@ function clientName(name, server, client) {
   return server.clients?.[client]?.name ?? name;
 }
 
+function clientOptions(server, client) {
+  const clientConfig = server.clients?.[client];
+  if (!clientConfig || typeof clientConfig !== 'object') return {};
+  const { name, enabled, ...options } = clientConfig;
+  return options;
+}
+
 function localCommand(server) {
   if (server.transport !== 'local') throw new Error(`unsupported transport: ${server.transport}`);
   return {
@@ -91,16 +98,45 @@ for (const [name, server] of entries) {
   if (!enabledFor(server, 'codex')) continue;
   const command = localCommand(server);
   const codexName = clientName(name, server, 'codex');
-  codexBlocks.push([
+  const options = clientOptions(server, 'codex');
+  const lines = [
     `[mcp_servers.${codexName}]`,
     `command = ${tomlString(command.command)}`,
     command.args.length ? `args = ${tomlArray(command.args)}` : '',
-  ].filter(Boolean).join('\n'));
+  ];
+  for (const [key, value] of Object.entries(options)) {
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      lines.push(`${key} = ${value}`);
+    } else if (typeof value === 'string') {
+      lines.push(`${key} = ${tomlString(value)}`);
+    }
+  }
+  codexBlocks.push(lines.filter(Boolean).join('\n'));
 }
 
 ensureDir(path.join(home, '.codex'));
 fs.writeFileSync(path.join(home, '.codex/config.toml'), codexTemplate.replace(marker, codexBlocks.join('\n\n')));
 
+const claudePath = path.join(home, '.claude.json');
+let claudeConfig = {};
+if (fs.existsSync(claudePath)) {
+  claudeConfig = JSON.parse(fs.readFileSync(claudePath, 'utf8'));
+}
+claudeConfig.mcpServers ??= {};
+for (const [name, server] of entries) {
+  if (!enabledFor(server, 'claude')) continue;
+  const command = localCommand(server);
+  const claudeName = clientName(name, server, 'claude');
+  claudeConfig.mcpServers[claudeName] = {
+    type: 'stdio',
+    command: command.command,
+    ...(command.args.length ? { args: command.args } : {}),
+  };
+}
+ensureDir(path.join(home, '.claude'));
+fs.writeFileSync(claudePath, JSON.stringify(claudeConfig, null, 2) + '\n');
+
 console.log('install-mcp: synced ~/.cursor/mcp.json');
 console.log('install-mcp: synced ~/.config/opencode/opencode.json');
 console.log('install-mcp: synced ~/.codex/config.toml');
+console.log('install-mcp: synced ~/.claude.json');

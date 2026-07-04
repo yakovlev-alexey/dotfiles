@@ -76,6 +76,8 @@ case "$mode" in
     DOTFILES_PROFILE="$profile" ./scripts/build-agents-md
     DOTFILES_PROFILE="$profile" ./scripts/install-skills
     DOTFILES_PROFILE="$profile" ./scripts/install-plugins
+    DOTFILES_PROFILE="$profile" ./scripts/install-uv
+    DOTFILES_PROFILE="$profile" ./scripts/install-telegram-mcp
     DOTFILES_PROFILE="$profile" ./scripts/install-mcp
     DOTFILES_PROFILE="$profile" ./scripts/install-editor-extensions
     if [[ "$profile" == wsl ]]; then

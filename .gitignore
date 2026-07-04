@@ -16,4 +16,5 @@ logs/
 *.sqlite-wal
 Brewfile.lock.json
 personal-store/
+ai/telegram-mcp.spec
 .codex
