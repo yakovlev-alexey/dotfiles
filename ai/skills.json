@@ -1,5 +1,6 @@
 {
   "yakovlev-alexey/skills": "*",
   "obra/superpowers": ["writing-skills", "brainstorming"],
-  "slidevjs/slidev": "slidev"
+  "slidevjs/slidev": "slidev",
+  "mattpocock/skills": ["grill-me", "grilling"]
 }
