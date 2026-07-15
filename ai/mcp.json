@@ -7,7 +7,7 @@
       "tool",
       "mcp",
       "connect",
-      "mcp.yandex.net/ws?servers=tracker_mcp"
+      "tracker_mcp"
     ],
     "clients": {
       "cursor": {
@@ -29,7 +29,7 @@
       "tool",
       "mcp",
       "connect",
-      "mcp.yandex.net/ws?servers=intrasearch"
+      "intrasearch"
     ],
     "clients": {
       "cursor": {
@@ -40,28 +40,6 @@
       },
       "codex": {
         "name": "intrasearch"
-      }
-    }
-  },
-  "arcanum": {
-    "enabled": true,
-    "transport": "local",
-    "command": "ya",
-    "args": [
-      "tool",
-      "mcp",
-      "connect",
-      "mcp.yandex.net/ws?servers=arcanum"
-    ],
-    "clients": {
-      "cursor": {
-        "name": "arcanum"
-      },
-      "opencode": {
-        "name": "arcanum"
-      },
-      "codex": {
-        "name": "arcanum"
       }
     }
   },
@@ -73,7 +51,7 @@
       "tool",
       "mcp",
       "connect",
-      "mcp.yandex.net/ws?servers=devtools"
+      "devtools"
     ],
     "clients": {
       "cursor": {
@@ -95,7 +73,7 @@
       "tool",
       "mcp",
       "connect",
-      "mcp.yandex.net/ws?servers=wiki"
+      "wiki"
     ],
     "clients": {
       "cursor": {
