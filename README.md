@@ -24,6 +24,7 @@ chsh -s "$(command -v zsh)"
 ## Managed
 
 - shell: `zsh`, fallback `bash`, shared aliases/functions;
+- nvm: auto-switch Node version from `.nvmrc` on `cd` (`shell/nvm-auto.zsh` / `shell/nvm-auto.sh`);
 - prompt: Starship with managed `~/.config/starship.toml`;
 - Git: shared `.gitconfig` plus generated `~/.gitconfig.local` from `scripts/personal`;
 - Codex/Cursor/OpenCode skills through the shared `~/.agents/skills` layer;

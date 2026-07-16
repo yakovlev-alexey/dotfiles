@@ -23,6 +23,8 @@ esac
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+# shellcheck source=shell/nvm-auto.sh
+[ -r "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/nvm-auto.sh" ] && . "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/nvm-auto.sh"
 
 export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
 case ":$PATH:" in
