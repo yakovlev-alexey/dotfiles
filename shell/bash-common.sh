@@ -10,6 +10,11 @@ if [ "$(uname -s)" = "Darwin" ] && [ -x /opt/homebrew/bin/brew ]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+if [ "$(uname -s)" = "Darwin" ] && [ -r "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/java.sh" ]; then
+  # shellcheck source=shell/java.sh
+  . "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/java.sh"
+fi
+
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;
   *) export PATH="$HOME/.local/bin:$PATH" ;;

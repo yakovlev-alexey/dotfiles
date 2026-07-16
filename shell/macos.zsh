@@ -28,6 +28,8 @@ esac
 
 [[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"
 
+[[ -r "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/java.sh" ]] && source "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/java.sh"
+
 cursor() {
   open -a "/Applications/Cursor.app" "$@"
 }
