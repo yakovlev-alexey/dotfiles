@@ -21,6 +21,7 @@ ecmel.vscode-html-css@2.0.14
 editorconfig.editorconfig@0.18.2
 esbenp.prettier-vscode@12.4.0
 figma.figma-vscode-extension@0.4.1
+fwcd.kotlin@0.2.36
 github.vscode-github-actions@0.32.1
 golang.go@0.54.0
 jdinhlife.gruvbox@1.29.1
@@ -41,6 +42,7 @@ naumovs.color-highlight@2.8.0
 perseus.vscode-yandex-arc@0.566.0 # cursor
 pflannery.vscode-versionlens@1.28.0
 prisma.prisma@31.11.0
+redhat.java@1.55.0
 redhat.vscode-yaml@1.23.0
 stylelint.vscode-stylelint@2.2.1
 teticio.python-envy@0.1.10
@@ -48,6 +50,11 @@ tomoki1207.pdf@1.2.2
 usernamehw.errorlens@3.26.0
 viknet.intelliboba@0.11.8
 vlkoti.vscode-sourcemaps-navigator@0.0.3
+vscjava.vscode-gradle@3.18.0
+vscjava.vscode-java-debug@0.59.0
+vscjava.vscode-java-dependency@0.27.6
+vscjava.vscode-java-test@0.45.0
+vscjava.vscode-maven@0.45.3
 vscode-icons-team.vscode-icons@12.19.0
 wholroyd.jinja@0.0.8
 yakovlev-alexey.frontmatter-preview-table@0.1.0
