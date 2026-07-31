@@ -20,12 +20,6 @@ if [[ -s "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting
   source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 fi
 
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
 [[ -d "$HOME/.opencode/bin" ]] && export PATH="$HOME/.opencode/bin:$PATH"
 
 [[ -r "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/java.sh" ]] && source "${DOTFILES_HOME:-$HOME/Repos/dotfiles}/shell/java.sh"
