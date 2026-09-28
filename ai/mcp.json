@@ -61,7 +61,7 @@
         "enabled": false
       },
       "codex": {
-        "enabled": false
+        "name": "devtools"
       }
     }
   },

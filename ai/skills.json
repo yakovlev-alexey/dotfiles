@@ -2,5 +2,20 @@
   "yakovlev-alexey/skills": "*",
   "obra/superpowers": ["writing-skills", "brainstorming"],
   "slidevjs/slidev": "slidev",
-  "mattpocock/skills": ["grill-me", "grilling"]
+  "mattpocock/skills": ["grill-me", "grilling"],
+  "~/arcadia/ai/artifacts/skills/infra": [
+    "agentic-search",
+    "arcadia-ci",
+    "arcanum-go",
+    "cirp-debug-checks",
+    "debug-tasklet-execution",
+    "tracker-mcp",
+    "ya-make"
+  ],
+  "~/arcadia/ai/artifacts/skills/teams/techplatform/aisuite": "aisuite",
+  "~/arcadia/ai/artifacts/skills/community": "arc-wt",
+  "~/arcadia/ai/artifacts/skills/mcp-skills": [
+    "docs",
+    "sandbox-mcp"
+  ]
 }

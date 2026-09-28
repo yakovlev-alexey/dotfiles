@@ -1,5 +1,5 @@
-model = "gpt-5.5"
-model_reasoning_effort = "medium"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
 personality = "pragmatic"
 
 [analytics]
@@ -32,6 +32,12 @@ enabled = true
 [plugins."figma@openai-curated"]
 enabled = true
 
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
+enabled = true
+
 [[skills.config]]
 name = "build-web-apps:supabase-postgres-best-practices"
 enabled = false
@@ -41,6 +47,7 @@ name = "build-web-apps:stripe-best-practices"
 enabled = false
 
 [features]
+hooks = true
 js_repl = false
 
 # __MCP_SERVERS__
