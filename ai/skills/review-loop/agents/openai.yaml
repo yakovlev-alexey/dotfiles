@@ -1,0 +1,6 @@
+interface:
+  display_name: "Review loop — вручную"
+  short_description: "Независимое ревью по явному вызову пользователя"
+  default_prompt: "Запусти $review-loop для текущего изменения."
+policy:
+  allow_implicit_invocation: false
