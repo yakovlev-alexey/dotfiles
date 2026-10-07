@@ -1,0 +1,9 @@
+# Codenv-only defaults. Merge with the platform-generated config; do not install on Mac.
+# Arc clients need a writable object store even for read-only repository commands.
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+model_reasoning_effort = "high"
+
+[sandbox_workspace_write]
+network_access = true
+writable_roots = ["/codenv/arc/store"]
