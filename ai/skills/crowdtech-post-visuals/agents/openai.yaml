@@ -1,0 +1,4 @@
+interface:
+  display_name: "Визуалы для постов CrowdTech"
+  short_description: "Картинки-слайды для постов в стиле CrowdTech"
+  default_prompt: "Используй $crowdtech-post-visuals, чтобы оформить материал в картинки-слайды для поста CrowdTech"
