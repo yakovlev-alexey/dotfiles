@@ -1,6 +1,6 @@
 {
   "yakovlev-alexey/skills": "*",
-  "obra/superpowers": ["writing-skills"],
+  "obra/superpowers": ["writing-skills", "brainstorming"],
   "slidevjs/slidev": "slidev",
   "toolittlecakes/mermaid-skill": "mermaid",
   "mattpocock/skills": ["grill-me", "grilling"],

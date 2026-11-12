@@ -36,7 +36,7 @@ Use this skill for changes to:
 
 ## Workflow
 
-1. Go to `$HOME/Repos/dotfiles`.
+1. Locate `$HOME/Repos/dotfiles` and use an appropriate task checkout according to the VCS instructions. Paths below are relative to that checkout.
 2. Edit the canonical source:
    - instructions: `ai/instructions/*.md`
    - generated `AGENTS.md`: run `./scripts/build-agents-md`
@@ -61,7 +61,7 @@ git diff
 git status --short
 ```
 
-5. Follow the user's and repository's VCS instructions. Stage only this task's files or hunks, inspect the staged diff, and preserve unrelated staged and working-tree changes. Commit when requested or permitted. Push or open a PR only when explicitly requested; configuration synchronization does not authorize either action.
+5. Follow the user's and repository's VCS instructions for the task branch, commits, publication, and draft PR. Use their implementation-request authorization rather than requiring a second push or PR request. Stage only this task's files or hunks, inspect the staged diff, and preserve unrelated staged and working-tree changes. Include the specification or agreed result and evidence of the affected live projections in the draft PR; disclose any consumer behavior that remains unverified. Read-only configuration analysis does not require a PR.
 
 ```bash
 git add -- <task-files>

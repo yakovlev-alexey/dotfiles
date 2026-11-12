@@ -2,7 +2,7 @@
 
 Use local repository context first.
 
-If a task or link mentions `yandex-team`, Yandex, Яндекс, Practicum, or Практикум, search internal context with `intrasearch` before making assumptions.
+If a task or link mentions `yandex-team`, Yandex, Яндекс, Crowd, or Крауд, search internal context with `intrasearch` before making assumptions.
 
 Use Tracker, Wiki, Arcanum, Sandbox, or other internal tools when the task clearly depends on those systems.
 
