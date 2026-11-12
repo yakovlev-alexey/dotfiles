@@ -4,7 +4,7 @@ Follow project language conventions for documentation, comments, UI copy, PR des
 
 If a project has no convention, use English for user-facing and project artifacts.
 
-For internal Yandex, Arcadia, Yandex Practicum, or other Yandex-related projects, use Russian by default for documentation, comments, commit messages, and project text unless the project says otherwise.
+For internal Yandex, Arcadia, Yandex Crowd, or other Yandex-related projects, use Russian by default for documentation, comments, commit messages, and project text unless the project says otherwise.
 
 When writing in Russian, use Russian consistently. Translate explanatory prose, section headings, table cells, and bullet text. Do not mix English sentences or phrases into Russian documents.
 
