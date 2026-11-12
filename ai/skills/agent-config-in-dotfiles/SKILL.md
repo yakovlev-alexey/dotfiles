@@ -42,13 +42,13 @@ Use this skill for changes to:
    - generated `AGENTS.md`: run `./scripts/build-agents-md`
    - MCP: `ai/mcp.json`, then `./scripts/install-mcp`
    - dotfiles-owned skills: `ai/skills/<skill-name>/SKILL.md`, then `./scripts/install-skills`
-   - public personal skills: `~/Repos/skills/<skill-name>/SKILL.md`, publish to the public skills repository, then `./scripts/install-skills`
+   - public personal skills: `~/Repos/skills/<skill-name>/SKILL.md`; publish only when authorized, then run `./scripts/install-skills` (the registry installs from the remote repository)
    - external skills: `ai/skills.json`, then `./scripts/install-skills`
    - agent hooks: `ai/hooks/policies/guards/<hook-name>/`, then `./scripts/install-agent-hooks`
    - plugins: `ai/plugins/plugins.json`, then `./scripts/install-plugins`
    - Codex config template: `codex/*.template.toml`
    - OpenCode config template: `opencode/*.template.json`
-3. Run validation:
+3. Run validation and verify the requested result in each affected live projection or client. Check that generated instructions match the canonical source, skills are present and resolve through the intended links, and the target consumer accepts the configuration. A successful installer or static check alone is insufficient; report any consumer behavior you could not verify.
 
 ```bash
 ./scripts/check
@@ -61,12 +61,12 @@ git diff
 git status --short
 ```
 
-5. Commit and push the dotfiles change:
+5. Follow the user's and repository's VCS instructions. Stage only this task's files or hunks, inspect the staged diff, and preserve unrelated staged and working-tree changes. Commit when requested or permitted. Push or open a PR only when explicitly requested; configuration synchronization does not authorize either action.
 
 ```bash
-git add -A
+git add -- <task-files>
+git diff --cached
 git commit -m "Update agent configuration"
-git push
 ```
 
 ## Adding Global Skills
@@ -113,4 +113,4 @@ If `./scripts/install-skills` reports `staged skill not found`, the registry val
 - Do not commit secrets, tokens, auth files, sessions, history, caches, SQLite files, or generated runtime state.
 - Do not edit generated live files as the source of truth. If a live file must be regenerated for local use, regenerate it from dotfiles scripts.
 - If the requested change came from experimenting in a live agent UI, promote the final desired state back into dotfiles before considering the task complete.
-- If there is no git remote yet, still commit locally and tell the user that push is blocked by missing remote.
+- If a requested push cannot proceed because there is no remote, report that limitation; do not create a remote or publish elsewhere without authorization.

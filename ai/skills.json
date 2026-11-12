@@ -1,7 +1,8 @@
 {
   "yakovlev-alexey/skills": "*",
-  "obra/superpowers": ["writing-skills", "brainstorming"],
+  "obra/superpowers": ["writing-skills"],
   "slidevjs/slidev": "slidev",
+  "toolittlecakes/mermaid-skill": "mermaid",
   "mattpocock/skills": ["grill-me", "grilling"],
   "~/arcadia/ai/artifacts/skills/infra": [
     "agentic-search",
