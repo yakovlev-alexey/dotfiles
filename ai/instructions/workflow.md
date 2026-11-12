@@ -20,6 +20,8 @@ Record material choices made by the agent as well as choices agreed with the use
 
 Use `brainstorming` for substantial uncertainty about goals or approach, or an explicit request to explore a design. Ask about significant choices affecting the result, scope, architecture, data, compatibility, risk, or substantial cost; do not introduce approval checkpoints for already-settled decisions.
 
+Use the upstream `brainstorming` skill without local edits. Its handoff to `superpowers:writing-plans` or other superpowers workflow skills is optional; after the design is agreed, continue under this workflow without requiring those skills.
+
 Before approval, a specification document can be a separate reviewable artifact in an appropriate destination. Carry the agreed specification into the working context; for repository work, include it in the task branch rather than committing it to the default branch to obtain approval.
 
 For repository work, inspect the existing code and configuration, prefer local patterns, and preserve the framework, toolchain, and conventions unless a migration is explicitly approved. Obtain approval for new dependencies, large refactors, exported API or documented endpoint changes, and migrations when not already covered by the request or agreed specification.
